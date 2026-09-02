@@ -121,4 +121,3 @@ npm run db:migrate:local
 History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
 Change history: [CHANGELOG.md](CHANGELOG.md).
 Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
