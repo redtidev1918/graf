@@ -1,4 +1,4 @@
-// Telegraph Node <-> Markdown conversion (port of tapnote/telegraph.py behaviour).
+// Telegraph Node <-> Markdown conversion (port of the legacy Django implementation's behaviour).
 import MarkdownIt from "markdown-it";
 import { decodeEntities } from "./entities";
 

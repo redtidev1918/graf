@@ -1,4 +1,6 @@
-# Graf —— 与原项目的关系
+# Graf —— 项目历史与血统
+
+> 本文是本仓库唯一集中记录前身名称与早期实现的地方，用于追溯与署名；仓库其余文档只指向 Graf。
 
 > 一句话：**vorniches/tapnote**（Django，MIT）→ **TeleNote**（功能 fork，Django，MIT）→
 > **Graf**（本仓库：为 Cloudflare Workers/D1 用 TypeScript 重写的通用新项目）。
@@ -12,7 +14,7 @@
 
 ## 2. TeleNote —— fork 及其增量
 
-TeleNote 是 tapnote 的 fork（作者 redtidev1918，GitHub 曾用账号 zoidberg-xgd）。fork 保留了上游的
+TeleNote 是作者 redtidev1918 对 tapnote 的 fork。fork 保留了上游的
 Django 基础，并新增：
 
 - Telegraph API 兼容层（createAccount/createPage/editPage/getPage/getPageList/getViews 等）

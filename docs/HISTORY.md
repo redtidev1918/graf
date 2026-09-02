@@ -1,4 +1,7 @@
-# Graf — origins and relationship to the original project
+# Graf — project history & lineage
+
+> This is the single document where the project's former names and earlier implementations are
+> recorded for traceability and attribution. Everything else in the repository refers only to Graf.
 
 > TL;DR: vorniches/tapnote (Django, MIT) → **TeleNote** (a feature fork, Django, MIT) → **Graf**
 > (this repository: TeleNote rewritten in TypeScript for Cloudflare Workers/D1).
@@ -13,7 +16,7 @@ under the `legacy-django` tag.
 
 ## 2. TeleNote — the fork
 
-TeleNote was created by forking tapnote (by the same author — GitHub account formerly zoidberg-xgd, now redtidev1918). The fork kept
+TeleNote was created by the same author (redtidev1918) as a fork of tapnote. The fork kept
 the upstream Django foundation and added:
 
 - a Telegra.ph-compatible API layer (createAccount/createPage/editPage/getPage/getPageList/getViews/…) with Node<->Markdown conversion (`tapnote/telegraph.py`);

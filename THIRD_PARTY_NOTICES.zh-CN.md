@@ -11,7 +11,7 @@ Graf 以 MIT 许可发布，但构建并分发使用了以下作品，在此声�
 
 ## 2. TeleNote fork（MIT）
 
-- 作者：redtidev1918（GitHub 曾用账号 zoidberg-xgd）。
+- 作者：redtidev1918。
 - 角色：新增 Telegraph API 面、ParaNote 评论整合、编辑器与社交功能；其行为契约
   移植进 Graf 的 TypeScript 实现。
 - 许可：MIT。

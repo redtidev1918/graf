@@ -5,9 +5,7 @@ Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API
 [Telegra.ph](https://telegra.ph) (the Telegraph API), designed to run entirely on
 **Cloudflare Workers + D1**. One short URL, instant pages, optional paragraph-level comments.
 
-It is the Cloudflare Workers successor of the Django project *TeleNote*, which itself was a fork
-of [vorniches/tapnote](https://github.com/vorniches/tapnote). See [docs/ORIGIN.md](docs/ORIGIN.md)
-for the full history and the legal/attribution details.
+Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
 
 ## Features
 
@@ -117,7 +115,7 @@ npm run db:migrate:local
 
 Graf builds on external projects and specifications; thanks to:
 
-- **vorniches/tapnote** (Sérgio Vorniches, MIT) — original Django implementation; source of this project's behaviour and data contract.
+- **Sérgio Vorniches** (MIT) — author of the original publishing implementation this project's design derives from.
 - **kkty/paranote** (MIT) — origin of the paragraph-comment system; the bundled paranote.js client derives from it.
 - **Telegra.ph / Telegraph API** — design reference and public API spec.
 - **markdown-it / markdown-it-footnote** (MIT) — Markdown rendering engine.
@@ -132,19 +130,15 @@ Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（�
 - Cloudflare Workers: https://developers.cloudflare.com/workers/
 - Cloudflare D1: https://developers.cloudflare.com/d1/
 - wrangler: https://developers.cloudflare.com/workers/wrangler/
-- vorniches/tapnote: https://github.com/vorniches/tapnote
 - kkty/paranote: https://github.com/kkty/paranote
 - markdown-it: https://github.com/markdown-it/markdown-it
 - Python-Markdown: https://python-markdown.github.io/
 
 > Primary documentation is in Simplified Chinese: [README.md](README.md).
 
-## Origins and license
+## License
 
-- vorniches/tapnote - original Django project (MIT, (c) 2025 Sergei Vorniches).
-- TeleNote (by the same author; GitHub account formerly zoidberg-xgd, now redtidev1918) - feature fork of tapnote (comments, Telegraph API, editor, ban system, tools).
-- Graf - 2026 TypeScript rewrite of TeleNote for Cloudflare Workers/D1.
-
-History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
-Change history: [CHANGELOG.md](CHANGELOG.md).
 Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
+Change history: [CHANGELOG.md](CHANGELOG.md).

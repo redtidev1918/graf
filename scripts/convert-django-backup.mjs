@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Convert a TeleNote (Django) JSON export into the Graf backup format.
-// Usage: node scripts/convert-django-backup.mjs tapnote_backup.json > graf-backup.json
+// Convert a backup exported by the previous Django implementation into the Graf format.
+// Usage: node scripts/convert-django-backup.mjs django-export.json > graf-backup.json
 import fs from 'node:fs';
 
 const input = process.argv[2];
 if (!input) {
-  console.error('usage: node scripts/convert-django-backup.mjs <tapnote_backup.json>');
+  console.error('usage: node scripts/convert-django-backup.mjs <django-export.json>');
   process.exit(1);
 }
 

@@ -12,7 +12,7 @@ are reproduced here in summary; full texts are available at the cited sources.
 
 ## 2. TeleNote fork (MIT)
 
-- Authors: redtidev1918 (formerly zoidberg-xgd).
+- Authors: redtidev1918.
 - Role: added the Telegraph API surface, ParaNote comment integration, editor/social features;
   behaviour contract ported into Graf's TypeScript.
 - Licence: MIT.

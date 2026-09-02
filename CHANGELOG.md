@@ -5,8 +5,8 @@ releases are tagged `vX.Y.Z` in this repository.
 
 ## [1.0.0] - 2026-09-03
 
-First release. Graf replaces the Django codebase of TeleNote with a Cloudflare Workers/D1
-implementation while keeping the behavioural contract of the original project.
+First release. Graf is the Cloudflare Workers/D1 implementation of the publishing platform
+(the project's lineage is documented in docs/HISTORY.md).
 
 ### Added
 
@@ -36,5 +36,5 @@ implementation while keeping the behavioural contract of the original project.
 
 ### Legacy
 
-- The full Django tree (tapnote foundation + TeleNote fork) is preserved at tag and branch `legacy-django`.
+- The previous Django-era codebase is preserved at tag and branch `legacy-django` (see docs/HISTORY.md).
 

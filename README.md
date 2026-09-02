@@ -4,7 +4,7 @@
 极简、**自托管的 Markdown 发布平台**，**兼容 Telegra.ph（Telegraph API）**，整个服务跑在
 **Cloudflare Workers + D1** 上：发布即得一个短链页面，可选段落级评论。
 
-> English: [README.en.md](README.en.md) ｜ Origin: [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md)
+> English: [README.en.md](README.en.md)
 
 ## 特性
 
@@ -14,7 +14,7 @@
 - **Markdown 页面**：免登录即写即发；支持删除线、表格、围栏代码、脚注、YouTube 嵌入与
   Open Graph 社交卡片。
 - **ParaNote 兼容评论**：段落级评论 + 点赞；前端使用仓库自带的 paranote.js，
-  服务端协议与旧版 TeleNote（Django 版）保持兼容（/api/v1/comments 等）。
+  协议端点：/api/v1/comments、like、ban。
 - **跑在边缘**：TypeScript + D1（SQLite），无需 VPS、Python 或 Docker；可选 CACHE_TTL
   对匿名读者做 HTML 边缘缓存。
 - **数据自持**：/admin 提供完整 JSON 备份与恢复（含旧 Django 版数据迁移脚本）。
@@ -87,34 +87,30 @@ curl -X POST https://your-worker.example/createPage \
 ## 评论
 
 ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落侧边评论与点赞；
-持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。协议与旧版 TeleNote 保持兼容。
+持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。
 
 ## 文档导航
 
 | 文档 | 英文 | 中文 |
 |---|---|---|
 | 项目说明 | [README.en.md](README.en.md) | [README.md](README.md) |
-| 原项目关系与血统 | [docs/ORIGIN.md](docs/ORIGIN.md) | [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md) |
+| 项目历史 | [docs/HISTORY.md](docs/HISTORY.md) | [docs/HISTORY.zh-CN.md](docs/HISTORY.zh-CN.md) |
 | API 参考 | [docs/API.md](docs/API.md) | [docs/API.zh-CN.md](docs/API.zh-CN.md) |
 | 部署指南 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md) |
 | 架构说明 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | [docs/ARCHITECTURE.zh-CN.md](docs/ARCHITECTURE.zh-CN.md) |
 | 变更记录 | [CHANGELOG.md](CHANGELOG.md) | [CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md) |
 | 第三方声明 | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md) |
 
-## 与原项目的关系
+## 历史
 
-- **vorniches/tapnote**（Django，MIT）—— 本项目的最初原型；
-- **TeleNote**（作者早期 fork 项目，曾用账号 zoidberg-xgd，现 redtidev1918）—— tapnote 的功能性 fork，Graf 的行为契约来源；
-- **Graf** —— 2026 年以 TypeScript 为 Cloudflare Workers/D1 的重写，作为独立通用的新项目发布。
-
-完整说明见 [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md)；旧 Django 代码保留在 tag/branch
-`legacy-django`。
+本项目由早期实现发展而来，完整血统与演变见 [docs/HISTORY.zh-CN.md](docs/HISTORY.zh-CN.md)；
+早期代码留存于 tag/branch `legacy-django`。
 
 ## 致谢
 
 本项目借鉴或依赖以下外部项目与规范，谨致谢意：
 
-- **vorniches/tapnote**（Sérgio Vorniches，MIT）—— 原始 Django 实现，本项目的功能与数据契约原型；
+- **Sérgio Vorniches**（MIT）—— 本项目设计所源自的早期发布站实现的作者；
 - **kkty/paranote**（MIT）—— 段落级评论体系的源头，仓库内 paranote.js 客户端由此派生；
 - **Telegra.ph / Telegraph API** —— 发布体验与公开 API 规范的参考；
 - **markdown-it、markdown-it-footnote**（MIT）—— Markdown 渲染引擎；
@@ -129,12 +125,10 @@ ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落�
 - Cloudflare Workers：https://developers.cloudflare.com/workers/
 - Cloudflare D1：https://developers.cloudflare.com/d1/
 - wrangler：https://developers.cloudflare.com/workers/wrangler/
-- vorniches/tapnote：https://github.com/vorniches/tapnote
 - kkty/paranote：https://github.com/kkty/paranote
 - markdown-it：https://github.com/markdown-it/markdown-it
 - Python-Markdown：https://python-markdown.github.io/
 
 ## 许可
 
-MIT License。原始上游版权归 Sergei Vorniches（tapnote）所有；fork 与本次重写版权归
-redtidev1918。详见 [LICENSE](LICENSE) 与 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。
+MIT License。版权与第三方署名详见 [LICENSE](LICENSE) 与 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。

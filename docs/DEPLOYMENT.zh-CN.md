@@ -81,13 +81,13 @@ curl -s -b cookies.txt https://notes.example.com/admin/export > backup.json
 
 也可在 Cloudflare 面板 D1 → graf → Export 直接快照数据库。
 
-## 9. 从 Django 版（TeleNote）迁移
+## 9. 从旧版（Django 实现）迁移
 
-1. 在旧 Django 后台导出（Data Migration → Export Notes）得到 tapnote_backup.json；
+1. 在旧版 Django 后台导出（Data Migration → Export Notes）得到 django-export.json；
 2. 转换为 Graf 格式：
 
 ```bash
-node scripts/convert-django-backup.mjs tapnote_backup.json > graf-backup.json
+node scripts/convert-django-backup.mjs django-export.json > graf-backup.json
 ```
 
 3. 登录新实例 /admin 导入 graf-backup.json。

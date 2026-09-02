@@ -81,13 +81,13 @@ The format is `{ format: "graf-backup", pages: […], comments: […] }`.
 
 You can also snapshot D1 itself from the Cloudflare dashboard (D1 → graf → Export).
 
-## 9. Migration from the Django version (TeleNote)
+## 9. Migrating from the previous Django implementation
 
-1. Export from the old Django admin (Data Migration → Export Notes) → `tapnote_backup.json`.
+1. Export from the previous Django admin (Data Migration → Export Notes) → `django-export.json`.
 2. Convert it to the Graf format:
 
 ```bash
-node scripts/convert-django-backup.mjs tapnote_backup.json > graf-backup.json
+node scripts/convert-django-backup.mjs django-export.json > graf-backup.json
 ```
 
 3. Log in to the new instance's /admin and import graf-backup.json.

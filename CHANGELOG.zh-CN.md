@@ -4,8 +4,7 @@ Graf 的显著变更记录于此。遵循语义化版本，Release 以 vX.Y.Z �
 
 ## [1.0.0] - 2026-09-03
 
-首个正式版。Graf 以 Cloudflare Workers/D1 实现取代 TeleNote 的 Django 代码库，
-同时保持原项目的行为契约。
+首个正式版。Graf 是以 Cloudflare Workers/D1 实现的发布平台（项目血统见 docs/HISTORY.zh-CN.md）。
 
 ### 新增
 
@@ -42,4 +41,4 @@ Graf 的显著变更记录于此。遵循语义化版本，Release 以 vX.Y.Z �
 
 ### 历史留存
 
-- 完整 Django 树（tapnote 基础 + TeleNote fork）保留于 tag/branch `legacy-django`。
+- 旧 Django 时代的代码库保留于 tag/branch `legacy-django`（见 docs/HISTORY.zh-CN.md）。

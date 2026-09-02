@@ -18,7 +18,7 @@ migrations/0001_init.sql ── D1 表结构
 
 ## 存储（D1）
 
-页面正文以 **Markdown** 存储（与旧版 TeleNote 的 Django 实现一致）。Telegraph 客户端发送 nodes，
+页面正文以 **Markdown** 存储。Telegraph 客户端发送 nodes，
 写时转 Markdown、读时（return_content=true）转回 nodes。评论以
 (site_id, work_id, chapter_id, created_at) 索引平铺存储；点赞独立建表并使用部分唯一索引
 （comment_id + user_id/ip），保证每个访客每条评论只能赞一次。

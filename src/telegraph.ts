@@ -1,4 +1,4 @@
-// Telegraph-compatible API endpoints (port of tapnote/views.py api_* handlers).
+// Telegraph-compatible API endpoints (port of the legacy Django implementation's handlers).
 import type { Config } from "./config";
 import { json, toBool, str, toInt, plainSnippet, nowIso, readParams, timingSafeEqualStr } from "./util";
 import { validatePath, randomPath, newEditToken, newAccessToken } from "./ids";

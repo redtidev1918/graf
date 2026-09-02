@@ -1,4 +1,4 @@
-// ParaNote-compatible comment endpoints (port of tapnote/views.py api_comments/api_like/api_ban).
+// ParaNote-compatible comment endpoints (port of the legacy Django implementation).
 import type { Config, Env } from "./config";
 import { json, str, toInt, nowIso, clientIp, readParams } from "./util";
 import { validateId } from "./ids";
