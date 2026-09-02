@@ -15,7 +15,7 @@ First release. Graf is the Cloudflare Workers/D1 implementation of the publishin
 - ParaNote-compatible comments: per-paragraph sidebar UI (`assets/js/paranote.js`), like system with per-visitor uniqueness, author delete rights, admin bans; endpoints `/api/v1/comments`, `/api/v1/comments/like`, `/api/v1/ban`.
 - Admin area `/admin`: HMAC-signed session login, dashboard, page/comment moderation, ban management, JSON export/import.
 - Storage on Cloudflare D1 (`migrations/0001_init.sql`); optional edge HTML cache via `CACHE_TTL`.
-- Tooling: `wrangler` v4 workflow, vitest suite (unit tests for nodes/render/ids/util), `tsc --noEmit` clean, GitHub Actions CI (typecheck + tests), one-shot deploy helper `scripts/deploy-cf.sh`, Django-backup converter `scripts/convert-django-backup.mjs`.
+- Tooling: `wrangler` v4 workflow, vitest suite (unit tests for nodes/render/ids/util), `tsc --noEmit` clean, GitHub Actions CI (typecheck + tests), cross-platform auto-deploy CLI `scripts/deploy.mjs` (install bootstrap `scripts/install.mjs`), Django-backup converter `scripts/convert-django-backup.mjs`.
 - Documentation: README (EN/zh-CN), API / Deployment / Architecture / Origin docs, MIT license with upstream attribution, third-party notices.
 
 ### Security

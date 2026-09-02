@@ -24,14 +24,14 @@ Cloudflare login, creates the D1 database, writes secrets, migrates and deploys,
 a few questions (site name, comments on/off, admin username/password):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.mjs -o /tmp/graf-install.mjs && node /tmp/graf-install.mjs
 ```
 
-Already cloned? Just run `./scripts/deploy-cf.sh` (or `npm run deploy:auto`).
+Already cloned? Just run `node scripts/deploy.mjs` (or `npm run deploy:auto`).
 To skip the questions, pre-set the variables:
 
 ```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
+ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' node scripts/deploy.mjs
 ```
 
 ### Manual step-by-step (optional)

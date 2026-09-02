@@ -12,13 +12,13 @@
 写密钥 → 建表 → 部署 → 线上自检）：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.mjs -o /tmp/graf-install.mjs && node /tmp/graf-install.mjs
 ```
 
 已克隆过仓库的，直接运行：
 
 ```bash
-./scripts/deploy-cf.sh      # 或 npm run deploy:auto
+node scripts/deploy.mjs      # 或 npm run deploy:auto
 ```
 
 脚本会做的事：

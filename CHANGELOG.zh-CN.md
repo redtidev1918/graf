@@ -17,7 +17,7 @@ Graf 的显著变更记录于此。遵循语义化版本，Release 以 vX.Y.Z �
 - /admin 后台：HMAC 签名会话登录、看板、页面/评论管理、封禁、JSON 导出/导入。
 - Cloudflare D1 存储（migrations/0001_init.sql）；可选 CACHE_TTL 边缘 HTML 缓存。
 - 工具链：wrangler v4、vitest（nodes/render/ids/util 单测）、tsc --noEmit 零错误、
-  GitHub Actions CI、一键部署脚本 scripts/deploy-cf.sh、Django 备份转换脚本
+  GitHub Actions CI、跨平台一键部署脚本 scripts/deploy.mjs（引导脚本 scripts/install.mjs）、Django 备份转换脚本
   scripts/convert-django-backup.mjs。
 - 文档：README（中/英）、API/部署/架构/原项目关系文档、MIT 许可（含上游署名）、第三方声明。
 

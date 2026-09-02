@@ -28,20 +28,20 @@
 写入密钥 → 建表 → 部署 → 线上自检）：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.mjs -o /tmp/graf-install.mjs && node /tmp/graf-install.mjs
 ```
 
 已在本地克隆过仓库的，直接运行（二选一）：
 
 ```bash
-./scripts/deploy-cf.sh      # 或 npm run deploy:auto
+node scripts/deploy.mjs      # 或 npm run deploy:auto
 ```
 
 脚本会交互询问：站点名（默认 Graf）、是否启用评论、管理员用户名与密码（输入不回显、
 二次确认）。想跳过问答可先用环境变量提供：
 
 ```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
+ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' node scripts/deploy.mjs
 ```
 
 ### 手动分步（可选）

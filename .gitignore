@@ -6,6 +6,8 @@ node_modules/
 .dev.vars
 *.local
 
+graf-deploy.log
+
 # build & test artifacts
 dist/
 coverage/
@@ -15,4 +17,3 @@ coverage/
 .DS_Store
 .idea/
 .vscode/
-

@@ -13,13 +13,13 @@ installs dependencies, checks the Cloudflare login, creates the D1 database, wri
 migrates, deploys and runs an online self-check):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.mjs -o /tmp/graf-install.mjs && node /tmp/graf-install.mjs
 ```
 
 Already cloned? Run:
 
 ```bash
-./scripts/deploy-cf.sh      # or: npm run deploy:auto
+node scripts/deploy.mjs      # or: npm run deploy:auto
 ```
 
 The script asks only: site name (default Graf), whether to enable comments, and the admin
