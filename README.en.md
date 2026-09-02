@@ -19,6 +19,23 @@ Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
 
 ## Quick start
 
+**One-command auto deploy (recommended)** — clones, installs dependencies, checks the
+Cloudflare login, creates the D1 database, writes secrets, migrates and deploys, asking only
+a few questions (site name, comments on/off, admin username/password):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+```
+
+Already cloned? Just run `./scripts/deploy-cf.sh` (or `npm run deploy:auto`).
+To skip the questions, pre-set the variables:
+
+```bash
+ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
+```
+
+### Manual step-by-step (optional)
+
 Prerequisites: Node.js >= 18 and a Cloudflare account with the free Workers plan.
 
 1. Clone and install:
@@ -93,15 +110,6 @@ When ENABLE_COMMENTS is on, published pages load assets/js/paranote.js, which re
 comment sidebar per paragraph, supports likes, and gives authors (edit-token holders) delete
 rights. Admins can ban abusive identities from /admin. The backend is ParaNote-protocol
 compatible (/api/v1/comments, /api/v1/comments/like, /api/v1/ban).
-
-## One-shot deploy
-
-Logged into Cloudflare already? Set your admin credentials and run the helper (it creates the
-D1 database, fills in `wrangler.toml`, pushes secrets, migrates and deploys):
-
-```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
-```
 
 ## Development
 

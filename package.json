@@ -44,7 +44,8 @@
     "db:migrate:remote": "wrangler d1 migrations apply graf --remote",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy:auto": "bash scripts/deploy-cf.sh"
   },
   "type": "module",
   "version": "1.0.0"

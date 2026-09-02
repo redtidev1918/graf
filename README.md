@@ -24,6 +24,28 @@
 
 ## 快速开始
 
+**最省事——一条命令全自动部署**（自动完成：克隆 → 装依赖 → 登录检查 → 创建数据库 →
+写入密钥 → 建表 → 部署 → 线上自检）：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+```
+
+已在本地克隆过仓库的，直接运行（二选一）：
+
+```bash
+./scripts/deploy-cf.sh      # 或 npm run deploy:auto
+```
+
+脚本会交互询问：站点名（默认 Graf）、是否启用评论、管理员用户名与密码（输入不回显、
+二次确认）。想跳过问答可先用环境变量提供：
+
+```bash
+ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
+```
+
+### 手动分步（可选）
+
 前置：Node.js >= 18、Cloudflare 账号（免费 Workers 套餐即可）。
 
 ```bash
@@ -44,12 +66,6 @@ npx wrangler secret put ADMIN_PASSWORD
 npx wrangler d1 migrations apply graf --remote
 npm run dev          # http://localhost:8787
 npm run deploy       # 上线（workers.dev 或自定义路由）
-```
-
-登录 Cloudflare 后也可用一键脚本（自动建库、回填 wrangler.toml、写 secret、迁移、部署）：
-
-```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
 ```
 
 打开首页 → 写 Markdown → 点 Publish，即可得到形如 `https://your-worker.example/Ab3xYz90/`

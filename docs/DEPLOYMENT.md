@@ -6,7 +6,28 @@
 - Cloudflare account (Workers free plan is fine; D1 free tier included).
 - For a custom domain: a zone on Cloudflare (see section 6).
 
-## 2. Local development
+## 2. Fastest path: one-command auto deploy (recommended)
+
+On a machine that does not have the repository yet, paste this single line (it clones the repo,
+installs dependencies, checks the Cloudflare login, creates the D1 database, writes secrets,
+migrates, deploys and runs an online self-check):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+```
+
+Already cloned? Run:
+
+```bash
+./scripts/deploy-cf.sh      # or: npm run deploy:auto
+```
+
+The script asks only: site name (default Graf), whether to enable comments, and the admin
+username/password (hidden input, double confirmation). To skip the questions pre-set the
+variables (`ADMIN_USERNAME`, `ADMIN_PASSWORD`); SECRET is auto-generated. The script is
+idempotent — re-run it to redeploy.
+
+## 3. Local development
 
 ```bash
 npm install
@@ -17,7 +38,7 @@ npm run dev                           # http://localhost:8787
 
 Local D1 data lives in `.wrangler/state` (gitignored).
 
-## 3. Create the production database
+## 4. Create the production database
 
 ```bash
 npx wrangler d1 create graf
@@ -29,7 +50,7 @@ Copy the printed `database_id` into `wrangler.toml` under `[[d1_databases]]`. Ap
 npx wrangler d1 migrations apply graf --remote
 ```
 
-## 4. Secrets
+## 5. Secrets
 
 ```bash
 npx wrangler secret put SECRET        # openssl rand -hex 32
@@ -40,15 +61,7 @@ npx wrangler secret put ADMIN_PASSWORD
 Optional: adjust [vars] in wrangler.toml (SITE_NAME, SITE_ID, ENABLE_COMMENTS, CACHE_TTL, MAX_PAGE_LENGTH).
 If your instance runs behind a custom domain, also set BASE_URL so generated URLs are absolute.
 
-## 5. One-shot helper
-
-After `npx wrangler login`, the helper below performs sections 3-4 and the deployment for you:
-
-```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
-```
-
-## 6. Deploy
+## 6. Deploy (manual — equivalent to step 7 of the auto script)
 
 ```bash
 npm run deploy     # npx wrangler deploy

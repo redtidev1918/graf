@@ -4,9 +4,38 @@
 
 - Node.js >= 18、npm。
 - Cloudflare 账号（Workers 免费套餐即可，D1 免费额度包含在内）。
-- 自定义域名：需一个托管在 Cloudflare 的 zone（见第 6 节）。
+- 自定义域名：需一个托管在 Cloudflare 的 zone（见第 7 节）。
 
-## 2. 本地开发
+## 2. 最快路径：一键全自动部署（推荐）
+
+没有克隆过仓库的机器，复制这一行回车即可（自动 clone → 装依赖 → 登录检查 → 建库 →
+写密钥 → 建表 → 部署 → 线上自检）：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/install.sh)
+```
+
+已克隆过仓库的，直接运行：
+
+```bash
+./scripts/deploy-cf.sh      # 或 npm run deploy:auto
+```
+
+脚本会做的事：
+
+1. 检查 Node/npm/git 与 Cloudflare 登录态（未登录会给出一次性登录指引后退出）；
+2. 交互询问站点名（默认 Graf）、是否启用评论、管理员用户名与密码（密码输入不回显、
+   两次确认；也可用环境变量 ADMIN_USERNAME/ADMIN_PASSWORD 跳过问答）；
+3. 自动生成 SECRET（openssl）并连同 ADMIN 凭据写入 Cloudflare Secret；
+4. 若 wrangler.toml 还是占位 database_id，自动创建 D1 库并回填；
+5. 执行 `wrangler d1 migrations apply --remote` 建表；
+6. 快速跑一遍 typecheck 与测试作自检；
+7. `wrangler deploy` 部署，解析 workers.dev 地址并 curl 自检首页；
+8. 打印站点/后台地址与后续建议。
+
+脚本幂等，可反复执行；再次部署时只需重跑同一命令。
+
+## 3. 本地开发
 
 ```bash
 npm install
@@ -17,7 +46,7 @@ npm run dev                           # http://localhost:8787
 
 本地 D1 数据位于 .wrangler/state（已被 gitignore）。
 
-## 3. 创建生产数据库
+## 4. 创建生产数据库
 
 ```bash
 npx wrangler d1 create graf
@@ -29,7 +58,7 @@ npx wrangler d1 create graf
 npx wrangler d1 migrations apply graf --remote
 ```
 
-## 4. 密钥
+## 5. 密钥
 
 ```bash
 npx wrangler secret put SECRET        # openssl rand -hex 32
@@ -40,15 +69,7 @@ npx wrangler secret put ADMIN_PASSWORD
 可选：调整 wrangler.toml 的 [vars]（SITE_NAME、SITE_ID、ENABLE_COMMENTS、CACHE_TTL、
 MAX_PAGE_LENGTH）。使用自定义域名时务必设置 BASE_URL，保证生成的链接为绝对地址。
 
-## 5. 一键脚本
-
-执行 `npx wrangler login` 后，以下脚本自动完成第 3、4 节与部署：
-
-```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
-```
-
-## 6. 部署
+## 6. 部署（手动，等价于一键脚本的第 7 步）
 
 ```bash
 npm run deploy     # npx wrangler deploy
