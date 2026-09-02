@@ -1,123 +1,149 @@
+
 # Graf
 
-Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API-compatible with**
-[Telegra.ph](https://telegra.ph) (the Telegraph API), designed to run entirely on
-**Cloudflare Workers + D1**. One short URL, instant pages, optional paragraph-level comments.
+极简、**自托管的 Markdown 发布平台**，**兼容 Telegra.ph（Telegraph API）**，整个服务跑在
+**Cloudflare Workers + D1** 上：发布即得一个短链页面，可选段落级评论。
 
-It is the Cloudflare Workers successor of the Django project *TeleNote*, which itself was a fork
-of [vorniches/tapnote](https://github.com/vorniches/tapnote). See [docs/ORIGIN.md](docs/ORIGIN.md)
-for the full history and the legal/attribution details.
+> English: [README.en.md](README.en.md) ｜ Origin: [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md)
 
-## Features
+## 特性
 
-- **Telegraph API compatible**: createAccount, createPage, editPage, getPage, getPageList, getViews, getAccountInfo, revokeAccessToken - drop-in for existing Telegraph clients.
-- **Markdown pages**: publish instantly from the built-in editor, no account needed. Strikethrough, tables, fenced code, footnotes, YouTube embeds and Open Graph social cards included.
-- **ParaNote-compatible comments**: Medium-style per-paragraph comments + likes, same API contract the bundled paranote.js client expects.
-- **On the edge**: Cloudflare Workers (TypeScript) + D1 (SQLite). No VPS, no Python, no Docker. Optional HTML caching via CACHE_TTL.
-- **Self-owned data**: full JSON backup/restore from /admin/export and /admin/import.
-- **Minimal admin**: login-gated dashboard for page/comment moderation, bans and data export/import.
-- **Safe by default**: raw HTML in Markdown never passes through (no stored XSS), anonymous comment identities are HMAC-derived, signed admin cookies, strict CSP.
+- **Telegraph API 兼容**：createAccount / getAccountInfo / revokeAccessToken / createPage /
+  editPage / getPage / getPageList / getViews —— 可直接替代 Telegra.ph，供 TelePress、各类
+  Telegram 机器人等既有客户端使用。
+- **Markdown 页面**：免登录即写即发；支持删除线、表格、围栏代码、脚注、YouTube 嵌入与
+  Open Graph 社交卡片。
+- **ParaNote 兼容评论**：段落级评论 + 点赞；前端使用仓库自带的 paranote.js，
+  服务端协议与 TeleNote 一致（/api/v1/comments 等）。
+- **跑在边缘**：TypeScript + D1（SQLite），无需 VPS、Python 或 Docker；可选 CACHE_TTL
+  对匿名读者做 HTML 边缘缓存。
+- **数据自持**：/admin 提供完整 JSON 备份与恢复（含旧 Django 版数据迁移脚本）。
+- **轻量后台**：登录后可管理页面 / 评论、封禁用户、导入导出。
+- **默认安全**：Markdown 中的原始 HTML 一律不穿透（杜绝存储型 XSS）；匿名评论身份由
+  HMAC 派生（不可反推 IP）；后台会话 cookie 带签名；默认开启严格 CSP 等安全响应头。
 
-## Quick start
+## 快速开始
 
-Prerequisites: Node.js >= 18 and a Cloudflare account with the free Workers plan.
-
-1. Clone and install:
+前置：Node.js >= 18、Cloudflare 账号（免费 Workers 套餐即可）。
 
 ```bash
 git clone <your-repo-url> graf
 cd graf
 npm install
-```
 
-2. Create the D1 database and put its id into wrangler.toml:
+# 1) 创建 D1 数据库，把输出的 database_id 填入 wrangler.toml 的 [[d1_databases]]
+npx wrangler d1 create graf
 
-```bash
-npx wrangler d1 create graf   # prints a database_id
-# paste the id into wrangler.toml -> [[d1_databases]] -> database_id
-npx wrangler d1 migrations apply graf --remote
-```
-
-3. Configure secrets (never commit them):
-
-```bash
-cp .dev.vars.example .dev.vars   # fill SECRET / ADMIN_USERNAME / ADMIN_PASSWORD
+# 2) 配置密钥（SECRET 必须更换；ADMIN_* 用于 /admin 登录）
+cp .dev.vars.example .dev.vars
 npx wrangler secret put SECRET
 npx wrangler secret put ADMIN_USERNAME
 npx wrangler secret put ADMIN_PASSWORD
+
+# 3) 建表 + 本地运行或部署
+npx wrangler d1 migrations apply graf --remote
+npm run dev          # http://localhost:8787
+npm run deploy       # 上线（workers.dev 或自定义路由）
 ```
 
-4. Run locally or deploy:
+登录 Cloudflare 后也可用一键脚本（自动建库、回填 wrangler.toml、写 secret、迁移、部署）：
 
 ```bash
-npm run dev        # http://localhost:8787
-npm run deploy     # publish to workers.dev or a custom route
+ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
 ```
 
-Open the root URL, write Markdown and hit Publish. You get a short URL such as
-https://your-worker.example/Ab3xYz90/. The edit_token is stored in an HttpOnly cookie;
-the page also offers a Copy-edit-link to restore editing from another browser.
+打开首页 → 写 Markdown → 点 Publish，即可得到形如 `https://your-worker.example/Ab3xYz90/`
+的短链。edit_token 保存在 HttpOnly cookie 中；页面上还有「复制编辑链接」，可在别的浏览器
+恢复编辑权。
 
-## Configuration
+## 配置项
 
-All settings are environment variables ([vars] in wrangler.toml or secrets):
+所有配置走环境变量（wrangler.toml 的 [vars] 或 Secret）：
 
-| Variable | Default | Description |
+| 变量 | 默认 | 说明 |
 |---|---|---|
-| SECRET | (required) | HMAC secret for admin sessions and anonymous comment identities. |
-| SITE_NAME | Graf | Brand shown in titles / Open Graph. |
-| SITE_ID | default | Comment namespace for this site instance. |
-| ENABLE_COMMENTS | true | Set false to disable the comment API and UI. |
-| MAX_PAGE_LENGTH | 200000 | Max characters of a page body. |
-| CACHE_TTL | 0 | Optional HTML cache TTL in seconds for anonymous readers (0 = off). |
-| BASE_URL | (auto) | Public base URL used to build absolute links. |
-| ADMIN_USERNAME / ADMIN_PASSWORD | (unset) | Enables /admin. |
+| SECRET | 必填 | HMAC 密钥：后台会话与匿名评论身份派生（openssl rand -hex 32） |
+| SITE_NAME | Graf | 站点名（标题 / Open Graph） |
+| SITE_ID | default | 评论数据命名空间（评论按 site 隔离） |
+| ENABLE_COMMENTS | true | 设为 false 关闭评论 API 与 UI |
+| MAX_PAGE_LENGTH | 200000 | 单篇正文最大字符数 |
+| CACHE_TTL | 0 | 匿名读者 HTML 缓存秒数（0 = 关闭） |
+| BASE_URL | 自动 | 生成绝对链接用的公开地址（自定义域名务必设置） |
+| ADMIN_USERNAME / ADMIN_PASSWORD | 未设置 | 设置后启用 /admin |
 
-## API compatibility
+## API
 
-All Telegraph methods live at the site root and accept both JSON bodies and
-form-encoded POSTs (GET is also accepted for getPage / getViews):
+Telegraph 方法都在站点根路径，同时接受 JSON 与表单 POST（getPage / getViews 也接受 GET）：
 
 ```bash
 curl -X POST https://your-worker.example/createPage \
-  --data-urlencode title=My-Page \
-  --data-urlencode access_token=YOUR_TOKEN \
-  --data-urlencode content=[{"tag":"p","children":["Hello world"]}]
+  --data-urlencode 'title=My Page' \
+  --data-urlencode 'access_token=YOUR_TOKEN' \
+  --data-urlencode 'content=[{"tag":"p","children":["Hello world"]}]'
 ```
 
-Full reference: [docs/API.md](docs/API.md). Deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+完整中文参考：[docs/API.zh-CN.md](docs/API.zh-CN.md)
 
-## Comments
+## 评论
 
-When ENABLE_COMMENTS is on, published pages load assets/js/paranote.js, which renders a
-comment sidebar per paragraph, supports likes, and gives authors (edit-token holders) delete
-rights. Admins can ban abusive identities from /admin. The backend is ParaNote-protocol
-compatible (/api/v1/comments, /api/v1/comments/like, /api/v1/ban).
+ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落侧边评论与点赞；
+持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。协议与 TeleNote 一致。
 
-## One-shot deploy
+## 文档导航
 
-Logged into Cloudflare already? Set your admin credentials and run the helper (it creates the
-D1 database, fills in `wrangler.toml`, pushes secrets, migrates and deploys):
+| 文档 | 英文 | 中文 |
+|---|---|---|
+| 项目说明 | [README.en.md](README.en.md) | [README.md](README.md) |
+| 原项目关系与血统 | [docs/ORIGIN.md](docs/ORIGIN.md) | [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md) |
+| API 参考 | [docs/API.md](docs/API.md) | [docs/API.zh-CN.md](docs/API.zh-CN.md) |
+| 部署指南 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md) |
+| 架构说明 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | [docs/ARCHITECTURE.zh-CN.md](docs/ARCHITECTURE.zh-CN.md) |
+| 变更记录 | [CHANGELOG.md](CHANGELOG.md) | [CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md) |
+| 第三方声明 | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md) |
 
-```bash
-ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
-```
+## 与原项目的关系
 
-## Development
+- **vorniches/tapnote**（Django，MIT）—— 本项目的最初原型；
+- **TeleNote**（zoidberg-xgd → redtidev1918）—— tapnote 的功能性 fork，Graf 的行为契约来源；
+- **Graf** —— 2026 年以 TypeScript 为 Cloudflare Workers/D1 的重写，作为独立通用的新项目发布。
 
-```bash
-npm test            # vitest unit tests
-npm run typecheck   # tsc --noEmit
-npm run db:migrate:local
-```
+完整说明见 [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md)；旧 Django 代码保留在 tag/branch
+`legacy-django`。
 
-## Origins and license
+## 致谢（Acknowledgments）
 
-- vorniches/tapnote - original Django project (MIT, (c) 2025 Sergei Vorniches).
-- TeleNote (zoidberg-xgd -> redtidev1918) - feature fork of tapnote (comments, Telegraph API, editor, ban system, tools).
-- Graf - 2026 TypeScript rewrite of TeleNote for Cloudflare Workers/D1.
+本项目站在许多开源项目与作者的肩上，谨致谢意：
 
-History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
-Change history: [CHANGELOG.md](CHANGELOG.md).
-Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- **[vorniches/tapnote](https://github.com/vorniches/tapnote)**（Sérgio Vorniches）——
+  最初的 Django 实现与 Telegra.ph 式发布理念，本项目的功能与数据契约由此而来；
+- **[TeleNote](https://github.com/redtidev1918/graf) fork 生态**——Telegraph API 兼容层、
+  ParaNote 评论整合、编辑器与社交预览、封禁与工具链的设计；
+- **[Paranote](https://github.com/kkty/paranote)**（kkty）及其派生 fork——段落级评论系统
+  的开创，仓库内 paranote.js 客户端即来自该家族；
+- **[Telegra.ph / Telegraph API](https://telegra.ph/api)**——简洁发布体验与公开 API 的设计灵感；
+- **[markdown-it](https://github.com/markdown-it/markdown-it)** 与
+  [markdown-it-footnote](https://github.com/markdown-it/markdown-it-footnote)（Vitaly Puzrin 等）——
+  本项目的 Markdown 渲染引擎；
+- **Django / Python-Markdown**——旧版本赖以运行的成熟基础；
+- **Cloudflare Workers / D1 / wrangler**——让本项目无需任何服务器的运行平台；
+- 以及所有反馈过问题、提过建议的使用者。
+
+（法律层面的第三方声明见 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。）
+
+## 参考（References）
+
+- Telegra.ph 官方 API：https://telegra.ph/api
+- Cloudflare Workers 文档：https://developers.cloudflare.com/workers/
+- Cloudflare D1 文档：https://developers.cloudflare.com/d1/
+- wrangler CLI：https://developers.cloudflare.com/workers/wrangler/
+- vorniches/tapnote（原始项目）：https://github.com/vorniches/tapnote
+- Paranote（评论系统原型）：https://github.com/kkty/paranote
+- TelePress（Telegraph 发布 CLI）：https://github.com/redtidev1918/TelePress
+- markdown-it：https://github.com/markdown-it/markdown-it
+- Python-Markdown：https://python-markdown.github.io/
+- 本仓库 Releases：https://github.com/redtidev1918/graf/releases
+
+## 许可
+
+MIT License。原始上游版权归 Sergei Vorniches（tapnote）所有；fork 与本次重写版权归
+redtidev1918。详见 [LICENSE](LICENSE) 与 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。
