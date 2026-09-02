@@ -116,7 +116,7 @@ npm run db:migrate:local
 Graf builds on external projects and specifications; thanks to:
 
 - **Sérgio Vorniches** (MIT) — author of the original publishing implementation this project's design derives from.
-- **kkty/paranote** (MIT) — origin of the paragraph-comment system; the bundled paranote.js client derives from it.
+- **ParaNote** ([redtidev1918/paranote](https://github.com/redtidev1918/paranote)) — the author's own paragraph-comment system; source of the comment protocol and the bundled paranote.js client.
 - **Telegra.ph / Telegraph API** — design reference and public API spec.
 - **markdown-it / markdown-it-footnote** (MIT) — Markdown rendering engine.
 - **Django / Python-Markdown** — ecosystem behind the legacy implementation.
@@ -130,7 +130,7 @@ Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（�
 - Cloudflare Workers: https://developers.cloudflare.com/workers/
 - Cloudflare D1: https://developers.cloudflare.com/d1/
 - wrangler: https://developers.cloudflare.com/workers/wrangler/
-- kkty/paranote: https://github.com/kkty/paranote
+- ParaNote (paragraph-comment protocol): https://github.com/redtidev1918/paranote
 - markdown-it: https://github.com/markdown-it/markdown-it
 - Python-Markdown: https://python-markdown.github.io/
 

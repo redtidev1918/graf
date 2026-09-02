@@ -111,7 +111,7 @@ ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落�
 本项目借鉴或依赖以下外部项目与规范，谨致谢意：
 
 - **Sérgio Vorniches**（MIT）—— 本项目设计所源自的早期发布站实现的作者；
-- **kkty/paranote**（MIT）—— 段落级评论体系的源头，仓库内 paranote.js 客户端由此派生；
+- **ParaNote**（作者的项目 [redtidev1918/paranote](https://github.com/redtidev1918/paranote)）—— 段落级评论协议与前端客户端来源；
 - **Telegra.ph / Telegraph API** —— 发布体验与公开 API 规范的参考；
 - **markdown-it、markdown-it-footnote**（MIT）—— Markdown 渲染引擎；
 - **Django、Python-Markdown** —— 旧版实现所依赖的生态；
@@ -125,7 +125,7 @@ ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落�
 - Cloudflare Workers：https://developers.cloudflare.com/workers/
 - Cloudflare D1：https://developers.cloudflare.com/d1/
 - wrangler：https://developers.cloudflare.com/workers/wrangler/
-- kkty/paranote：https://github.com/kkty/paranote
+- ParaNote（段落评论协议）：https://github.com/redtidev1918/paranote
 - markdown-it：https://github.com/markdown-it/markdown-it
 - Python-Markdown：https://python-markdown.github.io/
 

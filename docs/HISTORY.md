@@ -22,7 +22,7 @@ the upstream Django foundation and added:
 - a Telegra.ph-compatible API layer (createAccount/createPage/editPage/getPage/getPageList/getViews/…) with Node<->Markdown conversion (`tapnote/telegraph.py`);
 - a Markdown-first editor page with Open Graph / social preview cards and short 8-char URLs;
 - an optional per-paragraph **comment system** (ParaNote protocol: server endpoints in
-  `tapnote/views.py`, client `static/js/paranote.js` vendored from the ParaNote fork), including
+  `tapnote/views.py`, client `static/js/paranote.js` from the author's ParaNote project), including
   likes, per-comment deletion and user bans;
 - admin tools (Django admin, JSON export/import, PythonAnywhere auto-renewal scripts, CI).
 
@@ -69,8 +69,9 @@ It is intentionally a neutral codename; the brand strings are centralised in `sr
 ## 6. Legal
 
 - Graf's code is a new TypeScript implementation (no Python or Django code is redistributed).
-- The vendored `assets/js/paranote.js` client originates from the ParaNote comment project
-  (kkty/paranote family, MIT) via the TeleNote-era fork; see THIRD_PARTY_NOTICES.md.
+- The vendored `assets/js/paranote.js` client originates from the author's own ParaNote
+  project ([redtidev1918/paranote](https://github.com/redtidev1918/paranote), MIT);
+  see THIRD_PARTY_NOTICES.md.
 - The repository keeps the full history of tapnote and TeleNote (tag `legacy-django`, branch
   `legacy-django`) so the original MIT-licensed work and its authors remain accessible.
 - Licence: MIT. Copyright lines cover Sergei Vorniches (original tapnote) and redtidev1918

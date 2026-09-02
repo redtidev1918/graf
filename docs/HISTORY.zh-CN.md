@@ -20,7 +20,7 @@ Django 基础，并新增：
 - Telegraph API 兼容层（createAccount/createPage/editPage/getPage/getPageList/getViews 等）
   及 Node <-> Markdown 转换（tapnote/telegraph.py）；
 - Markdown 优先的编辑器页面：8 位短链、Open Graph/社交预览卡片；
-- 可选的**段落级评论系统**（ParaNote 协议：服务端端点 + 由 ParaNote fork 引入的
+- 可选的**段落级评论系统**（ParaNote 协议：服务端端点 + 引入自作者 ParaNote 项目的
   static/js/paranote.js 前端），含点赞、按作者删除、用户封禁；
 - 管理工具（Django admin、JSON 导入导出、PythonAnywhere 自动续期脚本、CI）。
 
@@ -63,8 +63,9 @@ src/config.ts（SITE_NAME）与 wrangler.toml（name），改名只动两处。
 ## 6. 法律
 
 - Graf 的代码是全新的 TypeScript 实现（未再分发 Python/Django 代码）。
-- 仓库内 assets/js/paranote.js 来自 ParaNote 评论项目（kkty/paranote 家族，MIT，
-  经 TeleNote 时期 fork 引入），详见 THIRD_PARTY_NOTICES.zh-CN.md。
+- 仓库内 assets/js/paranote.js 来自作者本人的 ParaNote 项目
+  （[redtidev1918/paranote](https://github.com/redtidev1918/paranote)，MIT），
+  详见 THIRD_PARTY_NOTICES.zh-CN.md。
 - 本仓库保留 tapnote 与 TeleNote 的完整历史（tag/branch `legacy-django`），
   使原 MIT 作品及其作者可追溯。
 - 许可：MIT。版权行同时保留 Sergei Vorniches（原始 tapnote）与 redtidev1918

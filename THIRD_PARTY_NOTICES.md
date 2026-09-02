@@ -19,10 +19,9 @@ are reproduced here in summary; full texts are available at the cited sources.
 
 ## 3. ParaNote client — assets/js/paranote.js (MIT)
 
-- Origin: [kkty/paranote](https://github.com/kkty/paranote) family; the copy shipped here comes
-  from the ParaNote fork used by TeleNote (redtidev1918).
-- Role: paragraph-level comment UI; consumed verbatim as a static asset.
-- Licence: MIT. If you redistribute it, keep the ParaNote attribution.
+- Origin: the author's own [redtidev1918/paranote](https://github.com/redtidev1918/paranote)
+  project (paragraph-comment service); the copy shipped here is used verbatim as a static asset.
+- Note: not a third-party work — same author as Graf. Licence: MIT.
 
 ## 4. markdown-it (MIT)
 
@@ -40,7 +39,7 @@ are reproduced here in summary; full texts are available at the cited sources.
 ### Licences at a glance
 
 ```text
-MIT License — vorniches/tapnote, TeleNote, ParaNote client, markdown-it, markdown-it-footnote
+MIT License — vorniches/tapnote, TeleNote, ParaNote (author-owned), markdown-it, markdown-it-footnote
 Apache-2.0 / BSD-3-Clause — Cloudflare Workers runtime & wrangler tooling
 ```
 

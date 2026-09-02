@@ -18,10 +18,9 @@ Graf 以 MIT 许可发布，但构建并分发使用了以下作品，在此声�
 
 ## 3. ParaNote 客户端 —— assets/js/paranote.js（MIT）
 
-- 来源：[kkty/paranote](https://github.com/kkty/paranote) 家族；本仓库所带副本来自
-  TeleNote 时期使用的 ParaNote fork（redtidev1918）。
-- 角色：段落级评论 UI，以静态资源原样分发。
-- 许可：MIT。若再分发请保留 ParaNote 出处。
+- 来源：作者本人的 [redtidev1918/paranote](https://github.com/redtidev1918/paranote)
+  项目（段落级评论服务）；本仓库以其静态资源原样使用。
+- 说明：并非第三方作品 —— 与 Graf 同属作者 redtidev1918。许可：MIT。
 
 ## 4. markdown-it（MIT）
 
@@ -38,6 +37,6 @@ Graf 以 MIT 许可发布，但构建并分发使用了以下作品，在此声�
 ### 许可一览
 
 ```text
-MIT —— vorniches/tapnote、TeleNote、ParaNote 客户端、markdown-it、markdown-it-footnote
+MIT —— vorniches/tapnote、TeleNote、ParaNote（作者自持）、markdown-it、markdown-it-footnote
 Apache-2.0 / BSD-3-Clause —— Cloudflare Workers 运行时与 wrangler 工具链
 ```
