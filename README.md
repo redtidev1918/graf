@@ -85,7 +85,8 @@ curl -X POST https://your-worker.example/createPage \
   --data-urlencode content=[{"tag":"p","children":["Hello world"]}]
 ```
 
-Full reference: [docs/API.md](docs/API.md).
+Full reference: [docs/API.md](docs/API.md). Deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Comments
 
@@ -93,6 +94,15 @@ When ENABLE_COMMENTS is on, published pages load assets/js/paranote.js, which re
 comment sidebar per paragraph, supports likes, and gives authors (edit-token holders) delete
 rights. Admins can ban abusive identities from /admin. The backend is ParaNote-protocol
 compatible (/api/v1/comments, /api/v1/comments/like, /api/v1/ban).
+
+## One-shot deploy
+
+Logged into Cloudflare already? Set your admin credentials and run the helper (it creates the
+D1 database, fills in `wrangler.toml`, pushes secrets, migrates and deploys):
+
+```bash
+ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/deploy-cf.sh
+```
 
 ## Development
 
@@ -109,5 +119,6 @@ npm run db:migrate:local
 - Graf - 2026 TypeScript rewrite of TeleNote for Cloudflare Workers/D1.
 
 History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
+Change history: [CHANGELOG.md](CHANGELOG.md).
 Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

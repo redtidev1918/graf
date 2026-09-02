@@ -87,6 +87,14 @@ curl -X POST https://your-worker.example/createPage \
 ENABLE_COMMENTS=true 时页面会自动加载 assets/js/paranote.js，提供段落侧边评论、点赞；
 持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。协议与 TeleNote 一致。
 
+## 一键部署
+
+已登录 Cloudflare 后，设置后台凭据并运行（自动建库、回填 wrangler.toml、写 secret、迁移、部署）：
+
+```bash
+ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/deploy-cf.sh
+```
+
 ## 开发
 
 ```bash

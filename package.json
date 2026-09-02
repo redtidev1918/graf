@@ -1,9 +1,41 @@
 {
-  "name": "graf",
-  "version": "1.0.0",
-  "private": true,
+  "bugs": {
+    "url": "https://github.com/redtidev1918/TeleNote/issues"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0",
+    "markdown-it-footnote": "^4.0.0"
+  },
   "description": "Graf — 极简自托管 Markdown 发布平台, Telegra.ph/Telegraph API 兼容, 跑在 Cloudflare Workers (D1) 上。源自 vorniches/tapnote → TeleNote。",
-  "type": "module",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260902.1",
+    "@types/markdown-it": "^14.1.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8",
+    "wrangler": "^4.128.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "homepage": "https://github.com/redtidev1918/TeleNote",
+  "keywords": [
+    "telegraph",
+    "telegra.ph",
+    "markdown",
+    "publishing",
+    "cloudflare-workers",
+    "d1",
+    "comments",
+    "notes",
+    "self-hosted"
+  ],
+  "license": "MIT",
+  "name": "graf",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redtidev1918/TeleNote.git"
+  },
   "scripts": {
     "dev": "wrangler dev",
     "dev:remote": "wrangler dev --remote",
@@ -14,21 +46,6 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "markdown-it": "^14.1.0",
-    "markdown-it-footnote": "^4.0.0"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260902.1",
-    "@types/markdown-it": "^14.1.2",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.8",
-    "wrangler": "^4.128.0"
-  },
-  "allowScripts": {
-    "workerd@1.20250718.0": true,
-    "esbuild@0.21.5": true,
-    "esbuild@0.17.19": true,
-    "sharp@0.33.5": true
-  }
+  "type": "module",
+  "version": "1.0.0"
 }
