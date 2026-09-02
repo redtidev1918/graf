@@ -1,0 +1,31 @@
+# Graf — Cloudflare Worker 配置
+# 部署步骤见 docs/DEPLOYMENT.md
+name = "graf"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# 静态资源(assets/ 目录)
+[assets]
+directory = "./assets"
+binding = "ASSETS"
+run_worker_first = true
+
+# 评论/备注功能默认开启; 任何需要服务端配置的项都走环境变量(见 .dev.vars.example)
+[vars]
+SITE_NAME = "Graf"
+SITE_ID = "default"
+ENABLE_COMMENTS = "true"
+MAX_PAGE_LENGTH = "200000"
+CACHE_TTL = "0"
+
+# D1 数据库: 先运行 wrangler d1 create graf 并把 database_id 填到这里
+[[d1_databases]]
+binding = "DB"
+database_name = "graf"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# 生产必需的密钥放在环境变量/Secret 中:
+#   SECRET / ADMIN_USERNAME / ADMIN_PASSWORD (见 .dev.vars.example)
+# 切勿把真实密钥提交到仓库。

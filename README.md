@@ -1,124 +1,113 @@
-# TeleNote
+# Graf
 
-[English](README.md) | [中文](README_CN.md) | [Documentation](docs/)
+Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API-compatible with**
+[Telegra.ph](https://telegra.ph) (the Telegraph API), designed to run entirely on
+**Cloudflare Workers + D1**. One short URL, instant pages, optional paragraph-level comments.
 
-**TeleNote** is a minimalist, self-hosted publishing platform inspired by [Telegra.ph](https://telegra.ph). It offers a distraction-free writing experience with instant Markdown publishing, paragraph-level comments, and a full-featured API.
+It is the Cloudflare Workers successor of the Django project *TeleNote*, which itself was a fork
+of [vorniches/tapnote](https://github.com/vorniches/tapnote). See [docs/ORIGIN.md](docs/ORIGIN.md)
+for the full history and the legal/attribution details.
 
-![Demo](media/demo.gif)
+## Features
 
-[**🔴 Live Demo**](https://zoidbergxgd.pythonanywhere.com/)
+- **Telegraph API compatible**: createAccount, createPage, editPage, getPage, getPageList, getViews, getAccountInfo, revokeAccessToken - drop-in for existing Telegraph clients.
+- **Markdown pages**: publish instantly from the built-in editor, no account needed. Strikethrough, tables, fenced code, footnotes, YouTube embeds and Open Graph social cards included.
+- **ParaNote-compatible comments**: Medium-style per-paragraph comments + likes, same API contract the bundled paranote.js client expects.
+- **On the edge**: Cloudflare Workers (TypeScript) + D1 (SQLite). No VPS, no Python, no Docker. Optional HTML caching via CACHE_TTL.
+- **Self-owned data**: full JSON backup/restore from /admin/export and /admin/import.
+- **Minimal admin**: login-gated dashboard for page/comment moderation, bans and data export/import.
+- **Safe by default**: raw HTML in Markdown never passes through (no stored XSS), anonymous comment identities are HMAC-derived, signed admin cookies, strict CSP.
 
-## ✨ Key Features
+## Quick start
 
-- **📝 Minimalist Editor**: Clean, distraction-free Markdown editor. No account required.
-- **⚡ Instant Publishing**: Publish anonymous articles in seconds.
-- **🔌 Telegraph API Compatible**: Drop-in replacement for Telegra.ph. Compatible with existing Telegraph clients and bots.
-- **💬 Paragraph Comments**: Integrated with [ParaNote](https://github.com/zoidberg-xgd/paranote) for Medium-style paragraph-level comments.
-- **🖼️ Social Previews**: Automatic Open Graph tags for beautiful cards on Telegram, Twitter/X, and WeChat.
-- **🔗 Smart Links**: Optimized 8-character short URLs.
-- **📦 Data Ownership**: Self-hosted. Import/Export data as JSON.
-- **🚀 Easy Deployment**: Docker support and automated scripts for PythonAnywhere.
+Prerequisites: Node.js >= 18 and a Cloudflare account with the free Workers plan.
 
-## 🚀 Quick Start
-
-### Using Docker (Recommended)
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/zoidberg-xgd/TeleNote.git
-   cd tapnote
-   ```
-
-2. **Run the setup script**
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-
-3. **Access the app**
-   Open your browser to `http://localhost:9009`.
-
-### Manual Installation
-
-1. Install dependencies: `pip install -r requirements.txt`
-2. Set up environment variables (copy `example.env` to `.env`).
-3. Run migrations: `python manage.py migrate`
-4. Start server: `python manage.py runserver 0.0.0.0:9009`
-
-## 🛠 API Usage
-
-TeleNote implements a complete **Telegraph API** clone. You can use it to create pages, manage accounts, and get view statistics programmatically.
-
-**Base URL**: `https://your-instance.com/`
-
-**Example: Create a Page**
+1. Clone and install:
 
 ```bash
-curl -X POST https://your-instance.com/createPage \
-  -d access_token="your_token" \
-  -d title="My Post" \
-  -d content='[{"tag":"p","children":["Hello World"]}]' \
-  -d return_content=true
+git clone <your-repo-url> graf
+cd graf
+npm install
 ```
 
-👉 **[Read the full API Documentation](docs/api.md)**
-
-## 📦 CLI Tools
-
-You can publish content directly using **[TelePress](https://github.com/zoidberg-xgd/telepress)** (installed via pip).
-
-1. Install TelePress: `pip install telepress`
-2. Publish a file:
+2. Create the D1 database and put its id into wrangler.toml:
 
 ```bash
-telepress my_article.md --api-url http://localhost:9009
+npx wrangler d1 create graf   # prints a database_id
+# paste the id into wrangler.toml -> [[d1_databases]] -> database_id
+npx wrangler d1 migrations apply graf --remote
 ```
 
-Alternatively, you can use the helper script `scripts/txt2tapnote.py` which wraps TelePress and provides additional features like domain replacement:
+3. Configure secrets (never commit them):
 
 ```bash
-python scripts/txt2tapnote.py my_article.md --server http://localhost:9009 --domain https://mynote.com
+cp .dev.vars.example .dev.vars   # fill SECRET / ADMIN_USERNAME / ADMIN_PASSWORD
+npx wrangler secret put SECRET
+npx wrangler secret put ADMIN_USERNAME
+npx wrangler secret put ADMIN_PASSWORD
 ```
 
-This supports:
-- Automatic pagination for long articles
-- Image uploading
-- Zip file galleries
-
-## ⚙️ Configuration
-
-Configuration is managed via the `.env` file.
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DEBUG` | Enable debug mode | `False` |
-| `SECRET_KEY` | Django secret key | (Required) |
-| `ALLOWED_HOSTS` | Comma-separated hosts | `*` |
-| `ENABLE_COMMENTS` | Enable comment system | `True` |
-
-## 🧪 Testing
-
-TeleNote comes with a comprehensive test suite covering the core logic, API endpoints, and configuration.
+4. Run locally or deploy:
 
 ```bash
-# Run all tests
-./run_tests.sh
-
-# Run with coverage report
-./run_tests.sh --coverage
+npm run dev        # http://localhost:8787
+npm run deploy     # publish to workers.dev or a custom route
 ```
 
-## 🤝 Contributing
+Open the root URL, write Markdown and hit Publish. You get a short URL such as
+https://your-worker.example/Ab3xYz90/. The edit_token is stored in an HttpOnly cookie;
+the page also offers a Copy-edit-link to restore editing from another browser.
 
-Contributions are welcome! See [Contributing Guide](docs/contributing.md) for details.
+## Configuration
 
-## 📄 License
+All settings are environment variables ([vars] in wrangler.toml or secrets):
 
-Distributed under the MIT License. See `LICENSE` for more information.
+| Variable | Default | Description |
+|---|---|---|
+| SECRET | (required) | HMAC secret for admin sessions and anonymous comment identities. |
+| SITE_NAME | Graf | Brand shown in titles / Open Graph. |
+| SITE_ID | default | Comment namespace for this site instance. |
+| ENABLE_COMMENTS | true | Set false to disable the comment API and UI. |
+| MAX_PAGE_LENGTH | 200000 | Max characters of a page body. |
+| CACHE_TTL | 0 | Optional HTML cache TTL in seconds for anonymous readers (0 = off). |
+| BASE_URL | (auto) | Public base URL used to build absolute links. |
+| ADMIN_USERNAME / ADMIN_PASSWORD | (unset) | Enables /admin. |
 
-## 🙏 Acknowledgments
+## API compatibility
 
-- **Telegra.ph**: The original inspiration.
-- **[vorniches/tapnote](https://github.com/vorniches/tapnote)**: The original project foundation.
-- **ParaNote**: Powering the comment system.
-- **Django & Tailwind**: The robust foundation.
+All Telegraph methods live at the site root and accept both JSON bodies and
+form-encoded POSTs (GET is also accepted for getPage / getViews):
+
+```bash
+curl -X POST https://your-worker.example/createPage \
+  --data-urlencode title=My-Page \
+  --data-urlencode access_token=YOUR_TOKEN \
+  --data-urlencode content=[{"tag":"p","children":["Hello world"]}]
+```
+
+Full reference: [docs/API.md](docs/API.md).
+
+## Comments
+
+When ENABLE_COMMENTS is on, published pages load assets/js/paranote.js, which renders a
+comment sidebar per paragraph, supports likes, and gives authors (edit-token holders) delete
+rights. Admins can ban abusive identities from /admin. The backend is ParaNote-protocol
+compatible (/api/v1/comments, /api/v1/comments/like, /api/v1/ban).
+
+## Development
+
+```bash
+npm test            # vitest unit tests
+npm run typecheck   # tsc --noEmit
+npm run db:migrate:local
+```
+
+## Origins and license
+
+- vorniches/tapnote - original Django project (MIT, (c) 2025 Sergei Vorniches).
+- TeleNote (zoidberg-xgd -> redtidev1918) - feature fork of tapnote (comments, Telegraph API, editor, ban system, tools).
+- Graf - 2026 TypeScript rewrite of TeleNote for Cloudflare Workers/D1.
+
+History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
+Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
