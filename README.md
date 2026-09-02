@@ -38,7 +38,9 @@ node scripts/deploy.mjs      # 或 npm run deploy:auto
 ```
 
 脚本会交互询问：站点名（默认 Graf）、是否启用评论、管理员用户名与密码（输入不回显、
-二次确认）。想跳过问答可先用环境变量提供：
+二次确认）。想跳过问答可先用环境变量提供（也可加 `--yes` 全自动，管理员密码自动生成并打印一次；
+`--dry-run` 可先演练）。Windows 同样支持（脚本为纯 Node，PowerShell 里把下载路径换成
+`$env:TEMP` 即可，详见 [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md)）。
 
 ```bash
 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' node scripts/deploy.mjs

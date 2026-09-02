@@ -27,6 +27,35 @@ username/password (hidden input, double confirmation). To skip the questions pre
 variables (`ADMIN_USERNAME`, `ADMIN_PASSWORD`); SECRET is auto-generated. The script is
 idempotent — re-run it to redeploy.
 
+### 2.1 Platform & CLI reference
+
+The deployer is a **pure Node script** that runs on macOS, Linux and Windows:
+
+- No repository yet (bootstrap): the curl+node one-liner above; on Windows PowerShell use
+  `curl.exe -fsSL <same-url> -o "$env:TEMP\graf-install.mjs"` then `node "$env:TEMP\graf-install.mjs"`;
+- Repository cloned: `node scripts/deploy.mjs` or the npm alias `npm run deploy:auto`.
+
+Common flags and npm aliases:
+
+| Command | What it does |
+|---|---|
+| `node scripts/deploy.mjs` | Interactive mode (recommended) |
+| `node scripts/deploy.mjs --yes` / `npm run deploy:auto:yes` | Fully automatic: defaults/env vars; auto-generates the admin password and prints it once |
+| `node scripts/deploy.mjs --dry-run` / `npm run deploy:dry` | Rehearsal: checks and edits local config only, never touches Cloudflare |
+| `--site-name <name>` | Site name (default Graf) |
+| `--no-comments` | Disable comments |
+| `--admin-user <name>` / `--admin-pass <value>` | Provide admin credentials non-interactively |
+| `--secret <hex>` | Provide SECRET (default: auto-generated) |
+| `--skip-selfcheck` | Skip the pre-deploy typecheck + tests |
+| `--no-color` / `--debug` | Disable colours / stream full wrangler debug output |
+| `-h` / `--help` | Help |
+
+Configuration can also come from the environment (`ADMIN_USERNAME`, `ADMIN_PASSWORD`,
+`SITE_NAME`, `ENABLE_COMMENTS`, `SECRET`); `CLOUDFLARE_API_TOKEN` can replace `wrangler login`.
+
+Logging: level-tagged console output plus a complete append log at `graf-deploy.log` in the
+repository root (gitignored); on failure the log path is printed for troubleshooting.
+
 ## 3. Local development
 
 ```bash

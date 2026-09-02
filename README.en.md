@@ -28,7 +28,9 @@ curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/in
 ```
 
 Already cloned? Just run `node scripts/deploy.mjs` (or `npm run deploy:auto`).
-To skip the questions, pre-set the variables:
+To skip the questions, pre-set the variables (or add `--yes` for fully automatic mode — the admin
+password is auto-generated and printed once; `--dry-run` rehearses without touching Cloudflare).
+Windows is supported too — the tool is pure Node; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ```bash
 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' node scripts/deploy.mjs

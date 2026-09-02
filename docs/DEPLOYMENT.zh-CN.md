@@ -35,6 +35,35 @@ node scripts/deploy.mjs      # 或 npm run deploy:auto
 
 脚本幂等，可反复执行；再次部署时只需重跑同一命令。
 
+### 2.1 平台与命令行参考
+
+部署器为**纯 Node 脚本**，macOS / Linux / Windows 均可运行：
+
+- 尚未克隆仓库（bootstrap）：上方 curl+node 一行即可；Windows PowerShell 用
+  `curl.exe -fsSL <同上URL> -o "$env:TEMP\graf-install.mjs"` 后 `node "$env:TEMP\graf-install.mjs"`；
+- 已克隆仓库：`node scripts/deploy.mjs` 或 npm 别名 `npm run deploy:auto`。
+
+常用参数与 npm 别名：
+
+| 命令 | 作用 |
+|---|---|
+| `node scripts/deploy.mjs` | 交互问答模式（推荐） |
+| `node scripts/deploy.mjs --yes` / `npm run deploy:auto:yes` | 全自动：用默认值/环境变量，自动生成管理员密码并打印一次 |
+| `node scripts/deploy.mjs --dry-run` / `npm run deploy:dry` | 演练：只检查与改本地配置，不触碰 Cloudflare |
+| `--site-name <名>` | 站点名（默认 Graf） |
+| `--no-comments` | 关闭评论 |
+| `--admin-user <名>` / `--admin-pass <值>` | 跳过交互提供管理员凭据 |
+| `--secret <hex>` | 指定 SECRET（默认自动生成） |
+| `--skip-selfcheck` | 跳过部署前的 typecheck+测试 |
+| `--no-color` / `--debug` | 关闭彩色输出 / 输出 wrangler 全量调试日志 |
+| `-h` / `--help` | 帮助 |
+
+也可用环境变量 `ADMIN_USERNAME`、`ADMIN_PASSWORD`、`SITE_NAME`、`ENABLE_COMMENTS`、
+`SECRET` 提供配置；登录态可用 `CLOUDFLARE_API_TOKEN` 替代 `wrangler login`。
+
+日志：控制台分级输出（信息/成功/警告/错误/步骤），同时完整落盘到仓库根的
+`graf-deploy.log`（已 gitignore）；失败时会提示日志路径便于排查。
+
 ## 3. 本地开发
 
 ```bash
