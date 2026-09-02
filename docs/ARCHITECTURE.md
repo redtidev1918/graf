@@ -18,7 +18,7 @@ migrations/0001_init.sql ── D1 schema
 
 ## Storage (D1)
 
-Pages store body text as **Markdown** (as in tapnote/TeleNote). Telegraph clients send nodes,
+Pages store body text as **Markdown** (as in the legacy Django version of TeleNote). Telegraph clients send nodes,
 which are converted to Markdown on write and back to nodes on read (`return_content=true`).
 Comments are stored flat with a (site_id, work_id, chapter_id, created_at) index; likes are a
 separate table with partial unique indexes (comment_id + user_id/ip) so a visitor can like once.

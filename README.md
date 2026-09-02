@@ -14,7 +14,7 @@
 - **Markdown 页面**：免登录即写即发；支持删除线、表格、围栏代码、脚注、YouTube 嵌入与
   Open Graph 社交卡片。
 - **ParaNote 兼容评论**：段落级评论 + 点赞；前端使用仓库自带的 paranote.js，
-  服务端协议与 TeleNote 一致（/api/v1/comments 等）。
+  服务端协议与旧版 TeleNote（Django 版）保持兼容（/api/v1/comments 等）。
 - **跑在边缘**：TypeScript + D1（SQLite），无需 VPS、Python 或 Docker；可选 CACHE_TTL
   对匿名读者做 HTML 边缘缓存。
 - **数据自持**：/admin 提供完整 JSON 备份与恢复（含旧 Django 版数据迁移脚本）。
@@ -87,7 +87,7 @@ curl -X POST https://your-worker.example/createPage \
 ## 评论
 
 ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落侧边评论与点赞；
-持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。协议与 TeleNote 一致。
+持有编辑令牌的作者可删除评论；管理员可在 /admin 拉黑。协议与旧版 TeleNote 保持兼容。
 
 ## 文档导航
 
