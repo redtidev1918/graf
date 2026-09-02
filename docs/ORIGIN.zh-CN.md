@@ -12,7 +12,7 @@
 
 ## 2. TeleNote —— fork 及其增量
 
-TeleNote 是 tapnote 的 fork（作者 zoidberg-xgd，后更名 redtidev1918）。fork 保留了上游的
+TeleNote 是 tapnote 的 fork（作者 redtidev1918，GitHub 曾用账号 zoidberg-xgd）。fork 保留了上游的
 Django 基础，并新增：
 
 - Telegraph API 兼容层（createAccount/createPage/editPage/getPage/getPageList/getViews 等）

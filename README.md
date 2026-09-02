@@ -104,44 +104,35 @@ ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落�
 ## 与原项目的关系
 
 - **vorniches/tapnote**（Django，MIT）—— 本项目的最初原型；
-- **TeleNote**（zoidberg-xgd → redtidev1918）—— tapnote 的功能性 fork，Graf 的行为契约来源；
+- **TeleNote**（作者早期 fork 项目，曾用账号 zoidberg-xgd，现 redtidev1918）—— tapnote 的功能性 fork，Graf 的行为契约来源；
 - **Graf** —— 2026 年以 TypeScript 为 Cloudflare Workers/D1 的重写，作为独立通用的新项目发布。
 
 完整说明见 [docs/ORIGIN.zh-CN.md](docs/ORIGIN.zh-CN.md)；旧 Django 代码保留在 tag/branch
 `legacy-django`。
 
-## 致谢（Acknowledgments）
+## 致谢
 
-本项目站在许多开源项目与作者的肩上，谨致谢意：
+本项目借鉴或依赖以下外部项目与规范，谨致谢意：
 
-- **[vorniches/tapnote](https://github.com/vorniches/tapnote)**（Sérgio Vorniches）——
-  最初的 Django 实现与 Telegra.ph 式发布理念，本项目的功能与数据契约由此而来；
-- **[TeleNote](https://github.com/redtidev1918/graf) fork 生态**——Telegraph API 兼容层、
-  ParaNote 评论整合、编辑器与社交预览、封禁与工具链的设计；
-- **[Paranote](https://github.com/kkty/paranote)**（kkty）及其派生 fork——段落级评论系统
-  的开创，仓库内 paranote.js 客户端即来自该家族；
-- **[Telegra.ph / Telegraph API](https://telegra.ph/api)**——简洁发布体验与公开 API 的设计灵感；
-- **[markdown-it](https://github.com/markdown-it/markdown-it)** 与
-  [markdown-it-footnote](https://github.com/markdown-it/markdown-it-footnote)（Vitaly Puzrin 等）——
-  本项目的 Markdown 渲染引擎；
-- **Django / Python-Markdown**——旧版本赖以运行的成熟基础；
-- **Cloudflare Workers / D1 / wrangler**——让本项目无需任何服务器的运行平台；
-- 以及所有反馈过问题、提过建议的使用者。
+- **vorniches/tapnote**（Sérgio Vorniches，MIT）—— 原始 Django 实现，本项目的功能与数据契约原型；
+- **kkty/paranote**（MIT）—— 段落级评论体系的源头，仓库内 paranote.js 客户端由此派生；
+- **Telegra.ph / Telegraph API** —— 发布体验与公开 API 规范的参考；
+- **markdown-it、markdown-it-footnote**（MIT）—— Markdown 渲染引擎；
+- **Django、Python-Markdown** —— 旧版实现所依赖的生态；
+- **Cloudflare（Workers / D1 / wrangler）** —— 运行平台。
 
-（法律层面的第三方声明见 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。）
+（第三方法律声明见 [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)。）
 
-## 参考（References）
+## 参考
 
-- Telegra.ph 官方 API：https://telegra.ph/api
-- Cloudflare Workers 文档：https://developers.cloudflare.com/workers/
-- Cloudflare D1 文档：https://developers.cloudflare.com/d1/
-- wrangler CLI：https://developers.cloudflare.com/workers/wrangler/
-- vorniches/tapnote（原始项目）：https://github.com/vorniches/tapnote
-- Paranote（评论系统原型）：https://github.com/kkty/paranote
-- TelePress（Telegraph 发布 CLI）：https://github.com/redtidev1918/TelePress
+- Telegra.ph API 规范：https://telegra.ph/api
+- Cloudflare Workers：https://developers.cloudflare.com/workers/
+- Cloudflare D1：https://developers.cloudflare.com/d1/
+- wrangler：https://developers.cloudflare.com/workers/wrangler/
+- vorniches/tapnote：https://github.com/vorniches/tapnote
+- kkty/paranote：https://github.com/kkty/paranote
 - markdown-it：https://github.com/markdown-it/markdown-it
 - Python-Markdown：https://python-markdown.github.io/
-- 本仓库 Releases：https://github.com/redtidev1918/graf/releases
 
 ## 许可
 

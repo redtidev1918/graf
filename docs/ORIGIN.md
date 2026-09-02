@@ -13,7 +13,7 @@ under the `legacy-django` tag.
 
 ## 2. TeleNote — the fork
 
-TeleNote was created by forking tapnote (author zoidberg-xgd, later redtidev1918). The fork kept
+TeleNote was created by forking tapnote (by the same author — GitHub account formerly zoidberg-xgd, now redtidev1918). The fork kept
 the upstream Django foundation and added:
 
 - a Telegra.ph-compatible API layer (createAccount/createPage/editPage/getPage/getPageList/getViews/…) with Node<->Markdown conversion (`tapnote/telegraph.py`);

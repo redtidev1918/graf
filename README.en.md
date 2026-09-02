@@ -113,10 +113,36 @@ npm run typecheck   # tsc --noEmit
 npm run db:migrate:local
 ```
 
+## Acknowledgments
+
+Graf builds on external projects and specifications; thanks to:
+
+- **vorniches/tapnote** (Sérgio Vorniches, MIT) — original Django implementation; source of this project's behaviour and data contract.
+- **kkty/paranote** (MIT) — origin of the paragraph-comment system; the bundled paranote.js client derives from it.
+- **Telegra.ph / Telegraph API** — design reference and public API spec.
+- **markdown-it / markdown-it-footnote** (MIT) — Markdown rendering engine.
+- **Django / Python-Markdown** — ecosystem behind the legacy implementation.
+- **Cloudflare (Workers / D1 / wrangler)** — runtime platform.
+
+Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（中文版：[THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)）.
+
+## References
+
+- Telegra.ph API spec: https://telegra.ph/api
+- Cloudflare Workers: https://developers.cloudflare.com/workers/
+- Cloudflare D1: https://developers.cloudflare.com/d1/
+- wrangler: https://developers.cloudflare.com/workers/wrangler/
+- vorniches/tapnote: https://github.com/vorniches/tapnote
+- kkty/paranote: https://github.com/kkty/paranote
+- markdown-it: https://github.com/markdown-it/markdown-it
+- Python-Markdown: https://python-markdown.github.io/
+
+> Primary documentation is in Simplified Chinese: [README.md](README.md).
+
 ## Origins and license
 
 - vorniches/tapnote - original Django project (MIT, (c) 2025 Sergei Vorniches).
-- TeleNote (zoidberg-xgd -> redtidev1918) - feature fork of tapnote (comments, Telegraph API, editor, ban system, tools).
+- TeleNote (by the same author; GitHub account formerly zoidberg-xgd, now redtidev1918) - feature fork of tapnote (comments, Telegraph API, editor, ban system, tools).
 - Graf - 2026 TypeScript rewrite of TeleNote for Cloudflare Workers/D1.
 
 History, behavior deltas and attribution: [docs/ORIGIN.md](docs/ORIGIN.md).
