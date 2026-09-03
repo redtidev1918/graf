@@ -16,6 +16,8 @@ run_worker_first = true
 SITE_NAME = "Graf"
 SITE_ID = "default"
 ENABLE_COMMENTS = "true"
+# 作品/合集模式(可关: 改为 false, 适用于纯文章站)
+BOOKS_ENABLED = "true"
 MAX_PAGE_LENGTH = "200000"
 CACHE_TTL = "0"
 
