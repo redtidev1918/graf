@@ -116,6 +116,7 @@ export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title
     "</div>" +
     (opts.bookNav || "") +
     "</article>" +
+    '<p class="wrap row dl-note"><a class="btn btn-sm ghost" href="/' + esc(opts.path) + '/download">下载本文（Markdown）</a></p>' +
     '<script src="/js/site.js" defer></script>' +
     comments;
   return layout({
@@ -190,6 +191,7 @@ export function bookChaptersHtml(cfg: Config, book: { path: string; title: strin
     (book.author ? '<p class="meta">作者：' + esc(book.author) + '</p>' : '') +
     (book.description ? '<p>' + esc(book.description) + '</p>' : '') +
     '<ol class="chapter-list">' + rows + '</ol>' +
+    (chapters.length ? '<p class="row"><a class="btn btn-sm" href="/book/' + esc(book.path) + '/download">下载全书（TXT）</a></p>' : '') +
     '<p><a class="btn btn-sm ghost" href="/books">← 作品列表</a></p></main>';
   return layout({ cfg, title: book.title + ' - ' + cfg.siteName, description: book.description || book.title, bodyClass: 'book-body', body });
 }

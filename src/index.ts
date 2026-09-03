@@ -4,7 +4,7 @@ import { loadConfig } from "./config";
 import { json } from "./util";
 import { routeTelegraphApi } from "./telegraph";
 import { routeCommentApi } from "./comments";
-import { homePage, publishPage, viewPage, editPageWeb, notFoundHtml, booksIndex, bookDetail } from "./web";
+import { homePage, publishPage, viewPage, editPageWeb, notFoundHtml, booksIndex, bookDetail, downloadPageMd, downloadBookTxt } from "./web";
 import { routeAdmin } from "./admin";
 
 const STATIC_PREFIXES = ["/css/", "/js/", "/favicon.ico", "/robots.txt"];
@@ -135,6 +135,10 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (!cfg.enableBooks || method !== "GET") return withSecurity(notFoundHtml(cfg));
     return withSecurity(await booksIndex({ cfg, env, request, url }));
   }
+  if (first === "book" && segs.length === 3 && segs[2] === "download") {
+    if (!cfg.enableBooks || method !== "GET") return withSecurity(notFoundHtml(cfg));
+    return withSecurity(await downloadBookTxt({ cfg, env, request, url }, segs[1]!));
+  }
   if (first === "book" && segs.length === 2) {
     if (!cfg.enableBooks || method !== "GET") return withSecurity(notFoundHtml(cfg));
     return withSecurity(await bookDetail({ cfg, env, request, url }, segs[1]!));
@@ -146,6 +150,9 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (rest === undefined || rest === "") {
     if (method === "GET") return withSecurity(await viewPage({ cfg, env, request, url }, pagePath));
     return withSecurity(json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405));
+  }
+  if (rest === "download" && segs.length === 2 && method === "GET") {
+    return withSecurity(await downloadPageMd({ cfg, env, request, url }, pagePath));
   }
   if (rest === "edit" && segs.length === 2) {
     return withSecurity(await editPageWeb({ cfg, env, request, url }, pagePath));

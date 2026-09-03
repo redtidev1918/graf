@@ -279,3 +279,47 @@ export async function bookDetail(c: ReqCtx, bookPath: string): Promise<Response>
   );
 }
 
+
+export async function downloadPageMd(c: ReqCtx, path: string): Promise<Response> {
+  if (!validatePath(path)) return html(notFoundPage(c.cfg), 404);
+  const page = await db.pageByPath(c.env.DB, path);
+  if (!page) return html(notFoundPage(c.cfg), 404);
+  const header = (page.title ? page.title + "\n\n" : "") + (page.author ? "作者：" + page.author + "\n\n" : "");
+  const body = header + page.content + "\n";
+  return new Response(body, {
+    headers: {
+      "content-type": "text/markdown; charset=utf-8",
+      "content-disposition": 'attachment; filename="graf-' + page.path + '.md"',
+    },
+  });
+}
+
+export async function downloadBookTxt(c: ReqCtx, bookPath: string): Promise<Response> {
+  if (!db.BOOK_PATH_RE.test(bookPath)) return html(notFoundPage(c.cfg), 404);
+  const book = await db.bookByPath(c.env.DB, bookPath);
+  if (!book) return html(notFoundPage(c.cfg), 404);
+  const chapters = await db.pagesByBook(c.env.DB, book.id);
+  const lines: string[] = [];
+  lines.push(book.title || book.path);
+  if (book.author) lines.push("作者：" + book.author);
+  if (book.description) lines.push(book.description);
+  lines.push("来源：https://" + (c.cfg.baseUrl ? new URL(c.cfg.baseUrl).host : c.url.host) + "/book/" + book.path + "/");
+  lines.push("");
+  chapters.forEach((p, i) => {
+    const order = p.order_num != null ? p.order_num : i + 1;
+    lines.push("第 " + order + " 章 " + (p.title || p.path));
+    lines.push("=".repeat(20));
+    lines.push(p.content.trim());
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  });
+  const txt = lines.join("\n");
+  return new Response(txt, {
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "content-disposition": 'attachment; filename="graf-' + book.path + '.txt"',
+    },
+  });
+}
+

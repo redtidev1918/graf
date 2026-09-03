@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-09-03
+
+### Added
+
+- Download a single page as Markdown (`/{path}/download`) and a whole book as TXT (`/book/{slug}/download`).
+- Editor author tools: draft autosave (localStorage, publish page) + live word count.
+
 ## [1.1.0] - 2026-09-03
 
 ### Added
