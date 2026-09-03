@@ -17,6 +17,8 @@ export interface PageRow {
   link_target: string;
   edit_token: string;
   account_id: number | null;
+  book_id: number | null;
+  order_num: number | null;
   views: number;
   created_at: string;
   updated_at: string;
@@ -127,7 +129,7 @@ export async function countAccounts(db: D1Database): Promise<number> {
 export async function pageByPath(db: D1Database, path: string): Promise<PageRow | null> {
   return first<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE path = ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages WHERE path = ?",
     path,
   );
 }
@@ -135,7 +137,7 @@ export async function pageByPath(db: D1Database, path: string): Promise<PageRow 
 export async function pageById(db: D1Database, id: number): Promise<PageRow | null> {
   return first<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE id = ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages WHERE id = ?",
     id,
   );
 }
@@ -185,7 +187,7 @@ export async function pagesByAccount(
   const totalRow = await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages WHERE account_id = ?", accountId);
   const pages = await all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE account_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages WHERE account_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
     accountId, limit, offset,
   );
   return { pages, total: totalRow?.n ?? 0 };
@@ -194,7 +196,7 @@ export async function pagesByAccount(
 export async function recentPages(db: D1Database, limit = 30, offset = 0): Promise<PageRow[]> {
   return all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
     limit, offset,
   );
 }
@@ -203,7 +205,7 @@ export async function searchPages(db: D1Database, q: string, limit = 200, offset
   const like = "%" + q + "%";
   return all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE path LIKE ? OR title LIKE ? OR author LIKE ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages WHERE path LIKE ? OR title LIKE ? OR author LIKE ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
     like, like, like, limit, offset,
   );
 }
@@ -221,6 +223,69 @@ export async function deletePage(db: D1Database, id: number): Promise<void> {
   ]);
 }
 
+export interface BookRow {
+  id: number;
+  path: string;
+  title: string;
+  author: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const BOOK_PATH_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
+
+export async function listBooks(db: D1Database): Promise<BookRow[]> {
+  return all<BookRow>(db, "SELECT id, path, title, author, description, created_at, updated_at FROM books ORDER BY created_at ASC, id ASC");
+}
+
+export async function bookById(db: D1Database, id: number): Promise<BookRow | null> {
+  return first<BookRow>(db, "SELECT id, path, title, author, description, created_at, updated_at FROM books WHERE id = ?", id);
+}
+
+export async function bookByPath(db: D1Database, path: string): Promise<BookRow | null> {
+  return first<BookRow>(db, "SELECT id, path, title, author, description, created_at, updated_at FROM books WHERE path = ?", path);
+}
+
+export async function createBook(db: D1Database, b: { path: string; title: string; author: string; description: string; created_at: string }): Promise<BookRow> {
+  const res = await run(
+    db,
+    "INSERT INTO books (path, title, author, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+    b.path, b.title, b.author, b.description, b.created_at, b.created_at,
+  );
+  return (await bookById(db, Number(res.meta.last_row_id)))!;
+}
+
+export async function deleteBook(db: D1Database, id: number): Promise<void> {
+  await batchExec(db, [
+    { sql: "UPDATE pages SET book_id = NULL, order_num = NULL WHERE book_id = ?", params: [id] },
+    { sql: "DELETE FROM books WHERE id = ?", params: [id] },
+  ]);
+}
+
+export async function assignPageToBook(db: D1Database, pageId: number, bookId: number, orderNum: number): Promise<void> {
+  await run(db, "UPDATE pages SET book_id = ?, order_num = ? WHERE id = ?", bookId, orderNum, pageId);
+}
+
+export async function unassignPageFromBook(db: D1Database, pageId: number): Promise<void> {
+  await run(db, "UPDATE pages SET book_id = NULL, order_num = NULL WHERE id = ?", pageId);
+}
+
+export async function pagesByBook(db: D1Database, bookId: number): Promise<PageRow[]> {
+  return all<PageRow>(
+    db,
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages WHERE book_id = ? ORDER BY (order_num IS NULL) ASC, order_num ASC, id ASC",
+    bookId,
+  );
+}
+
+export async function bookStats(db: D1Database): Promise<Array<{ book_id: number; n: number; last_update: string }>> {
+  return all<{ book_id: number; n: number; last_update: string }>(
+    db,
+    "SELECT book_id, COUNT(*) AS n, MAX(updated_at) AS last_update FROM pages WHERE book_id IS NOT NULL GROUP BY book_id",
+  );
+}
+
 export async function countPages(db: D1Database): Promise<number> {
   const row = await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages");
   return row?.n ?? 0;
@@ -233,6 +298,8 @@ export interface BackupPage {
   content: string;
   link_target: string;
   edit_token: string;
+  book_id: number | null;
+  order_num: number | null;
   views: number;
   created_at: string;
   updated_at: string;
@@ -262,10 +329,10 @@ export async function importBackup(db: D1Database, pages: BackupPage[], comments
   for (const p of pages) {
     items.push({
       sql:
-        "INSERT INTO pages (path, title, author, content, link_target, edit_token, views, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "INSERT INTO pages (path, title, author, content, link_target, edit_token, book_id, order_num, views, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
         "ON CONFLICT(path) DO UPDATE SET title = excluded.title, author = excluded.author, content = excluded.content, " +
-        "link_target = excluded.link_target, edit_token = excluded.edit_token, views = excluded.views, updated_at = excluded.updated_at",
-      params: [p.path, p.title, p.author, p.content, p.link_target, p.edit_token, p.views, p.created_at, p.updated_at],
+        "link_target = excluded.link_target, edit_token = excluded.edit_token, book_id = excluded.book_id, order_num = excluded.order_num, views = excluded.views, updated_at = excluded.updated_at",
+      params: [p.path, p.title, p.author, p.content, p.link_target, p.edit_token, p.book_id, p.order_num, p.views, p.created_at, p.updated_at],
     });
   }
   for (const cm of comments) {
@@ -285,7 +352,7 @@ export async function importBackup(db: D1Database, pages: BackupPage[], comments
 }
 
 export async function allPagesForExport(db: D1Database): Promise<PageRow[]> {
-  return all<PageRow>(db, "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages ORDER BY id ASC");
+  return all<PageRow>(db, "SELECT id, path, title, author, content, link_target, edit_token, account_id, book_id, order_num, views, created_at, updated_at FROM pages ORDER BY id ASC");
 }
 
 // ---------- comments ----------

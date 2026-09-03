@@ -5,7 +5,7 @@ import {
 } from "./util";
 import { validatePath, randomPath, newEditToken } from "./ids";
 import { renderMarkdown } from "./markdown/render";
-import { editorPage, notePage, notFoundPage } from "./templates";
+import { editorPage, notePage, notFoundPage, chapterNavHtml, booksIndexHtml, bookChaptersHtml, type BookListItem, type BookChapterItem } from "./templates";
 import * as db from "./db";
 import { getCookie } from "./auth";
 
@@ -129,6 +129,31 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
   const metaDescription = page.author ? "作者 " + page.author + " · " + plainSnippet(page.content, 180) : plainSnippet(page.content, 180);
   const image = firstImage(page.content);
 
+  let bookNav: string | undefined;
+  if (c.cfg.enableBooks && page.book_id != null) {
+    try {
+      const book = await db.bookById(c.env.DB, page.book_id);
+      if (book) {
+        const chapters = await db.pagesByBook(c.env.DB, book.id);
+        const idx = chapters.findIndex((p) => p.id === page.id);
+        if (idx >= 0) {
+          const prev = idx > 0 ? chapters[idx - 1] : undefined;
+          const next = idx < chapters.length - 1 ? chapters[idx + 1] : undefined;
+          bookNav = chapterNavHtml({
+            bookPath: book.path,
+            bookTitle: book.title,
+            prevPath: prev ? prev.path : null,
+            nextPath: next ? next.path : null,
+            index: idx + 1,
+            total: chapters.length,
+          });
+        }
+      }
+    } catch {
+      bookNav = undefined;
+    }
+  }
+
   let res = html(
     notePage(c.cfg, {
       contentHtml,
@@ -142,6 +167,7 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
       canEdit,
       path: page.path,
       editToken: canEdit ? page.edit_token : null,
+      bookNav,
     }),
   );
 
@@ -217,3 +243,39 @@ export async function editPageWeb(c: ReqCtx, path: string): Promise<Response> {
 export function notFoundHtml(cfg: Config): Response {
   return html(notFoundPage(cfg), 404);
 }
+export async function booksIndex(c: ReqCtx): Promise<Response> {
+  const books = await db.listBooks(c.env.DB);
+  const stats = await db.bookStats(c.env.DB);
+  const statMap = new Map<number, { n: number; last_update: string }>();
+  for (const st of stats) statMap.set(st.book_id, st);
+  const items: BookListItem[] = books.map((b) => {
+    const st = statMap.get(b.id);
+    return {
+      path: b.path,
+      title: b.title,
+      author: b.author,
+      description: b.description,
+      count: st ? st.n : 0,
+      lastUpdate: st ? st.last_update : b.updated_at,
+    };
+  });
+  return html(booksIndexHtml(c.cfg, items));
+}
+
+export async function bookDetail(c: ReqCtx, bookPath: string): Promise<Response> {
+  if (!db.BOOK_PATH_RE.test(bookPath)) return html(notFoundPage(c.cfg), 404);
+  const book = await db.bookByPath(c.env.DB, bookPath);
+  if (!book) return html(notFoundPage(c.cfg), 404);
+  const chapters = await db.pagesByBook(c.env.DB, book.id);
+  const items: BookChapterItem[] = chapters.map((p) => ({
+    path: p.path,
+    title: p.title,
+    order: p.order_num,
+    words: p.content.length,
+    updated: p.updated_at,
+  }));
+  return html(
+    bookChaptersHtml(c.cfg, { path: book.path, title: book.title, author: book.author, description: book.description }, items),
+  );
+}
+

@@ -95,3 +95,12 @@ pre { white-space: pre-wrap; word-break: break-word; }
   .post-head h1 { font-size: 25px; }
   .markdown-content { font-size: 16px; }
 }
+
+/* novel mode */
+.book-list, .chapter-list { list-style: none; padding: 0; }
+.book-list li, .chapter-list li { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.book-title { font-size: 1.1em; font-weight: 700; text-decoration: none; color: var(--ink); }
+.small { font-size: 12px; }
+.book-nav { margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+.book-nav .row { justify-content: space-between; }
+

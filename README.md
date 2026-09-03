@@ -86,6 +86,7 @@ npm run deploy       # 上线（workers.dev 或自定义路由）
 | ENABLE_COMMENTS | true | 设为 false 关闭评论 API 与 UI |
 | MAX_PAGE_LENGTH | 200000 | 单篇正文最大字符数 |
 | CACHE_TTL | 0 | 匿名读者 HTML 缓存秒数（0 = 关闭） |
+| BOOKS_ENABLED | false | 小说模式：作品列表(/books)、章节目录(/book/{标识})、章节上下页导航、后台「作品」管理 |
 | BASE_URL | 自动 | 生成绝对链接用的公开地址（自定义域名务必设置） |
 | ADMIN_USERNAME / ADMIN_PASSWORD | 未设置 | 设置后启用 /admin |
 
@@ -101,6 +102,11 @@ curl -X POST https://your-worker.example/createPage \
 ```
 
 完整中文参考：[docs/API.zh-CN.md](docs/API.zh-CN.md)
+
+## 小说模式（可选）
+
+BOOKS_ENABLED=true 时启用：在后台「作品」建书并把页面章节按顺序归入作品；读者访问 /books 与
+/book/{标识}/ 目录，章节页自动带「上一章 / 回目录 / 下一章」导航。
 
 ## 评论
 

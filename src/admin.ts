@@ -68,6 +68,7 @@ function adminShell(cfg: Config, title: string, body: string, active = ""): stri
     ["/admin/pages", "页面", "pages"],
     ["/admin/comments", "评论", "comments"],
   ];
+  if (cfg.enableBooks) links.push(["/admin/books", "作品", "books"]);
   for (const [href, label, key] of links) {
     nav.push('<a href="' + href + '" class="' + (key === active ? "on" : "") + '">' + label + "</a>");
   }
@@ -161,6 +162,7 @@ export async function routeAdmin(c: ReqCtx): Promise<Response> {
   if (path === "/admin/actions/delete-comment") return deleteCommentAction(c);
   if (path === "/admin/export") return exportData(c);
   if (path === "/admin/import") return importData(c);
+  if (path === "/admin/books" || path === "/admin/books/") return booksAdmin(c);
   return html(adminShell(c.cfg, "Not found", "<p>未找到。</p>"), 404);
 }
 
@@ -326,7 +328,7 @@ async function exportData(c: ReqCtx): Promise<Response> {
     siteId: c.cfg.siteId,
     pages: pages.map((p) => ({
       path: p.path, title: p.title, author: p.author, content: p.content,
-      link_target: p.link_target, edit_token: p.edit_token, views: p.views,
+      link_target: p.link_target, edit_token: p.edit_token, book_id: p.book_id, order_num: p.order_num, views: p.views,
       created_at: p.created_at, updated_at: p.updated_at,
     })),
     comments: comments.map((cm) => ({
@@ -372,6 +374,8 @@ function parseBackup(raw: unknown, cfg: Config): { pages: db.BackupPage[]; comme
       content,
       link_target: p.link_target === "_blank" ? "_blank" : "_self",
       edit_token: typeof p.edit_token === "string" ? p.edit_token.slice(0, 128) : "",
+      book_id: typeof p.book_id === "number" && Number.isInteger(p.book_id) && p.book_id > 0 ? p.book_id : null,
+      order_num: typeof p.order_num === "number" && Number.isInteger(p.order_num) ? p.order_num : null,
       views,
       created_at: created,
       updated_at: isIsoText(p.updated_at) ? p.updated_at : created,
@@ -447,5 +451,97 @@ async function importData(c: ReqCtx): Promise<Response> {
       400,
     );
   }
+}
+// ---- book (novel site) admin ----
+async function booksAdmin(c: ReqCtx): Promise<Response> {
+  if (c.request.method === "POST") {
+    const form = await c.request.formData().catch(() => null);
+    const action = form ? String(form.get("action") || "") : "";
+    if (!form) return redir("/admin/books");
+    const bookRedirect = String(form.get("book") || "");
+    if (action === "create") {
+      const title = (form.get("title") || "").toString().trim().slice(0, 200);
+      const path = (form.get("path") || "").toString().trim().toLowerCase().slice(0, 64);
+      const author = (form.get("author") || "").toString().trim().slice(0, 100);
+      const description = (form.get("description") || "").toString().trim().slice(0, 2000);
+      if (title && db.BOOK_PATH_RE.test(path)) {
+        const existing = await db.bookByPath(c.env.DB, path);
+        if (!existing) await db.createBook(c.env.DB, { path, title, author, description, created_at: nowIso() });
+      }
+    } else if (action === "delete") {
+      const path = (form.get("path") || "").toString().trim();
+      const book = path ? await db.bookByPath(c.env.DB, path) : null;
+      if (book) await db.deleteBook(c.env.DB, book.id);
+    } else if (action === "assign") {
+      const bookPath = (form.get("book") || "").toString().trim();
+      const pagePath = (form.get("pagePath") || "").toString().trim();
+      const orderRaw = form.get("order") ? Number(form.get("order")) : NaN;
+      const book = bookPath ? await db.bookByPath(c.env.DB, bookPath) : null;
+      const page = validatePath(pagePath) ? await db.pageByPath(c.env.DB, pagePath) : null;
+      if (book && page) {
+        const order = Number.isInteger(orderRaw) && orderRaw >= 0 ? Math.trunc(orderRaw) : null;
+        if (order === null) {
+          const chapters = await db.pagesByBook(c.env.DB, book.id);
+          const maxOrder = chapters.reduce((m, p) => Math.max(m, p.order_num ?? 0), 0);
+          await db.assignPageToBook(c.env.DB, page.id, book.id, maxOrder + 1);
+        } else {
+          await db.assignPageToBook(c.env.DB, page.id, book.id, order);
+        }
+      }
+    } else if (action === "unassign") {
+      const pagePath = (form.get("pagePath") || "").toString().trim();
+      const page = validatePath(pagePath) ? await db.pageByPath(c.env.DB, pagePath) : null;
+      if (page) await db.unassignPageFromBook(c.env.DB, page.id);
+    }
+    return redir("/admin/books?book=" + encodeURIComponent(bookRedirect));
+  }
+
+  const active = c.url.searchParams.get("book") || "";
+  const stats = await db.bookStats(c.env.DB);
+  const statMap = new Map<number, { n: number; last_update: string }>();
+  for (const st of stats) statMap.set(st.book_id, st);
+  const books = await db.listBooks(c.env.DB);
+  const bodyParts: string[] = [];
+  bodyParts.push("<h1>作品管理</h1>");
+
+  if (active) {
+    const book = await db.bookByPath(c.env.DB, active);
+    if (!book) return html(adminShell(c.cfg, "作品", "<p class=\"alert\">未找到该书。</p>"), 404);
+    const chapters = await db.pagesByBook(c.env.DB, book.id);
+    const rows = chapters
+      .map((p, i) => {
+        const order = p.order_num != null ? p.order_num : i + 1;
+        const u = '<form class="inline" method="post" action="/admin/books"><input type="hidden" name="action" value="unassign"><input type="hidden" name="book" value="' + esc(book.path) + '"><input type="hidden" name="pagePath" value="' + esc(p.path) + '"><button class="btn btn-sm danger" type="submit">移出</button></form>';
+        return "<tr><td>" + order + "</td><td><a href=\"/" + esc(p.path) + "/\">" + esc(p.title || p.path) + "</a></td><td>" + p.content.length + "</td><td>" + u + "</td></tr>";
+      })
+      .join("");
+    bodyParts.push(
+      "<h2>" + esc(book.title) + "（" + esc(book.path) + "）· 共 " + chapters.length + " 章</h2>" +
+      '<table class="table"><thead><tr><th>序</th><th>章节</th><th>字数</th><th></th></tr></thead><tbody>' + rows + "</tbody></table>" +
+      '<h2>添加章节</h2>' +
+      '<form method="post" action="/admin/books" class="row"><input type="hidden" name="action" value="assign"><input type="hidden" name="book" value="' + esc(book.path) + '">' +
+      '<input type="text" name="pagePath" placeholder="章节页 path（如 Abcdef12）"><input type="number" name="order" placeholder="顺序(可选,留空=末尾)">' +
+      '<button class="btn btn-sm" type="submit">加入本书</button></form>' +
+      '<p><a class="btn btn-sm ghost" href="/admin/books">← 全部作品</a> <a class="btn btn-sm ghost" href="/book/' + esc(book.path) + '">预览目录</a></p>'
+    );
+  } else {
+    const rows = books
+      .map((b) => {
+        const st = statMap.get(b.id);
+        const n = st ? st.n : 0;
+        const del = '<form class="inline" method="post" action="/admin/books" data-confirm="确定删除该书？（章节会移出但不删除页面）"><input type="hidden" name="action" value="delete"><input type="hidden" name="path" value="' + esc(b.path) + '"><button class="btn btn-sm danger" type="submit">删除</button></form>';
+        return "<tr><td><a href=\"/admin/books?book=" + encodeURIComponent(b.path) + "\">" + esc(b.title) + "</a></td><td>" + esc(b.path) + "</td><td>" + esc(b.author || "-") + "</td><td>" + n + "</td><td>" + del + "</td></tr>";
+      })
+      .join("");
+    bodyParts.push(
+      '<table class="table"><thead><tr><th>书名</th><th>标识</th><th>作者</th><th>章节</th><th></th></tr></thead><tbody>' + rows + "</tbody></table>" +
+      '<h2>新建作品</h2>' +
+      '<form method="post" action="/admin/books" class="row"><input type="hidden" name="action" value="create">' +
+      '<input type="text" name="title" placeholder="书名" required><input type="text" name="path" placeholder="标识(小写字母数字-) 如 my-novel" required>' +
+      '<input type="text" name="author" placeholder="作者(可选)"><input type="text" name="description" placeholder="简介(可选)">' +
+      '<button class="btn btn-sm" type="submit">创建</button></form>'
+    );
+  }
+  return html(adminShell(c.cfg, "作品", bodyParts.join("\n"), "books"));
 }
 

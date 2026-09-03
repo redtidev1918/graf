@@ -4,7 +4,7 @@ import { loadConfig } from "./config";
 import { json } from "./util";
 import { routeTelegraphApi } from "./telegraph";
 import { routeCommentApi } from "./comments";
-import { homePage, publishPage, viewPage, editPageWeb, notFoundHtml } from "./web";
+import { homePage, publishPage, viewPage, editPageWeb, notFoundHtml, booksIndex, bookDetail } from "./web";
 import { routeAdmin } from "./admin";
 
 const STATIC_PREFIXES = ["/css/", "/js/", "/favicon.ico", "/robots.txt"];
@@ -128,6 +128,16 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (first === "publish") {
     if (method === "POST" || method === "GET") return withSecurity(await publishPage({ cfg, env, request, url }));
     return withSecurity(json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405));
+  }
+
+  // ---- book mode (novel site) ----
+  if (first === "books" && segs.length === 1) {
+    if (!cfg.enableBooks || method !== "GET") return withSecurity(notFoundHtml(cfg));
+    return withSecurity(await booksIndex({ cfg, env, request, url }));
+  }
+  if (first === "book" && segs.length === 2) {
+    if (!cfg.enableBooks || method !== "GET") return withSecurity(notFoundHtml(cfg));
+    return withSecurity(await bookDetail({ cfg, env, request, url }, segs[1]!));
   }
 
   // note pages: /{path}, /{path}/, /{path}/edit

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - 2026-09-03
+
+### Added
+
+- Novel mode (BOOKS_ENABLED): books + book_id/order_num on pages (migration 0003), /books and
+  /book/{id} catalogs, prev/next chapter navigation, admin Books management; backups carry book metadata.
+- UI now defaults to Simplified Chinese.
+
+### Fixed
+
+- D1 batch protocol on production (prepared statements) — found by remote deployment testing.
+- CI matrix runs on Node 22/24 (integration tests need node:sqlite).
+
 ## [1.0.1] - 2026-09-03
 
 Stabilization pass: data-integrity, security and contract hardening on the existing

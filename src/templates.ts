@@ -94,7 +94,7 @@ export function editorPage(cfg: Config, opts: { error?: string | null; action?: 
   });
 }
 
-export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title: string; description: string; image: string | null; canonical: string; dateLabel: string }; canEdit: boolean; path: string; editToken: string | null }): string {
+export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title: string; description: string; image: string | null; canonical: string; dateLabel: string }; canEdit: boolean; path: string; editToken: string | null; bookNav?: string }): string {
   const note = opts.meta;
   const headerParts: string[] = [];
   headerParts.push('<header class="post-head">');
@@ -113,7 +113,9 @@ export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title
     headerParts.join("\n") +
     '<div class="markdown-content" data-na-root data-work-id="' + esc(opts.path) + '" data-chapter-id="main">' +
     opts.contentHtml +
-    "</div></article>" +
+    "</div>" +
+    (opts.bookNav || "") +
+    "</article>" +
     '<script src="/js/site.js" defer></script>' +
     comments;
   return layout({
@@ -126,3 +128,69 @@ export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title
     body,
   });
 }
+export function chapterNavHtml(opts: { bookPath: string; bookTitle: string; prevPath: string | null; nextPath: string | null; index: number | null; total: number | null }): string {
+  const parts: string[] = [];
+  parts.push('<nav class="book-nav">');
+  if (opts.prevPath) parts.push('<a class="btn btn-sm ghost" href="/' + esc(opts.prevPath) + '/">← 上一章</a> ');
+  parts.push('<a class="btn btn-sm ghost" href="/book/' + esc(opts.bookPath) + '">回目录</a>');
+  if (opts.nextPath) parts.push(' <a class="btn btn-sm ghost" href="/' + esc(opts.nextPath) + '/">下一章 →</a>');
+  if (opts.index != null && opts.total != null) parts.push('<p class="dim small">' + opts.index + ' / ' + opts.total + ' · ' + esc(opts.bookTitle) + '</p>');
+  parts.push('</nav>');
+  return parts.join('\n');
+}
+
+export interface BookListItem {
+  path: string;
+  title: string;
+  author: string;
+  description: string;
+  count: number;
+  lastUpdate: string;
+}
+
+export function booksIndexHtml(cfg: Config, items: BookListItem[]): string {
+  const rows = items.length
+    ? items
+        .map((b) => {
+          const last = b.lastUpdate ? esc(b.lastUpdate.slice(0, 10)) : '';
+          return '<li class="book-item"><a class="book-title" href="/book/' + esc(b.path) + '">' + esc(b.title) + '</a>' +
+            (b.author ? '<span class="meta"> 作者：' + esc(b.author) + '</span>' : '') +
+            '<p class="meta">' + (b.description ? esc(b.description) : '') + '</p>' +
+            '<p class="meta">共 ' + b.count + ' 章 · 最近更新 ' + last + '</p></li>';
+        })
+        .join('')
+    : '<li class="book-item"><p class="meta">还没有作品。</p></li>';
+  const body =
+    '<main class="wrap"><a class="brand" href="/">' + esc(cfg.siteName) + '</a>' +
+    '<h1>作品列表</h1><ul class="book-list">' + rows + '</ul></main>';
+  return layout({ cfg, title: '作品列表 - ' + cfg.siteName, description: cfg.siteName + ' 作品列表', bodyClass: 'books-body', body });
+}
+
+export interface BookChapterItem {
+  path: string;
+  title: string;
+  order: number | null;
+  words: number;
+  updated: string;
+}
+
+export function bookChaptersHtml(cfg: Config, book: { path: string; title: string; author: string; description: string }, chapters: BookChapterItem[]): string {
+  let n = 0;
+  const rows = chapters
+    .map((ch) => {
+      n += 1;
+      const label = ch.order != null ? ch.order : n;
+      return '<li><a href="/' + esc(ch.path) + '/">' + esc(ch.title || '第 ' + label + ' 章') + '</a>' +
+        '<span class="meta"> ' + ch.words + ' 字 · ' + esc(ch.updated.slice(0, 10)) + '</span></li>';
+    })
+    .join('');
+  const body =
+    '<main class="wrap"><a class="brand" href="/">' + esc(cfg.siteName) + '</a>' +
+    '<h1>' + esc(book.title) + '</h1>' +
+    (book.author ? '<p class="meta">作者：' + esc(book.author) + '</p>' : '') +
+    (book.description ? '<p>' + esc(book.description) + '</p>' : '') +
+    '<ol class="chapter-list">' + rows + '</ol>' +
+    '<p><a class="btn btn-sm ghost" href="/books">← 作品列表</a></p></main>';
+  return layout({ cfg, title: book.title + ' - ' + cfg.siteName, description: book.description || book.title, bodyClass: 'book-body', body });
+}
+

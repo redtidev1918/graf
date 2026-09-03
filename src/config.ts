@@ -9,6 +9,7 @@ export interface Env {
   ENABLE_COMMENTS?: string;
   MAX_PAGE_LENGTH?: string;
   CACHE_TTL?: string;
+  BOOKS_ENABLED?: string;
   COMMENT_RATE_LIMIT?: string;
   LIKE_RATE_LIMIT?: string;
   ADMIN_USERNAME?: string;
@@ -23,6 +24,7 @@ export interface Config {
   enableComments: boolean;
   maxPageLength: number;
   cacheTtlSeconds: number;
+  enableBooks: boolean;
   adminUsername: string | null;
   adminPassword: string | null;
   commentGuestPrefix: string;
@@ -67,6 +69,7 @@ export function loadConfig(env: Env): Config {
     enableComments,
     maxPageLength: envInt(env.MAX_PAGE_LENGTH, 200_000),
     cacheTtlSeconds: envInt(env.CACHE_TTL, 0),
+    enableBooks: envBool(env.BOOKS_ENABLED, false),
     adminUsername,
     adminPassword,
     commentGuestPrefix: "Guest-",

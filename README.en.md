@@ -88,6 +88,7 @@ All settings are environment variables ([vars] in wrangler.toml or secrets):
 | ENABLE_COMMENTS | true | Set false to disable the comment API and UI. |
 | MAX_PAGE_LENGTH | 200000 | Max characters of a page body. |
 | CACHE_TTL | 0 | Optional HTML cache TTL in seconds for anonymous readers (0 = off). |
+| BOOKS_ENABLED | false | Novel mode: /books index, /book/{slug} catalogs, prev/next chapter navigation, admin Books management. |
 | BASE_URL | (auto) | Public base URL used to build absolute links. |
 | ADMIN_USERNAME / ADMIN_PASSWORD | (unset) | Enables /admin. |
 
@@ -105,6 +106,11 @@ curl -X POST https://your-worker.example/createPage \
 
 Full reference: [docs/API.md](docs/API.md). Deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Novel mode (optional)
+
+With BOOKS_ENABLED=true, create books in the admin area and group chapter pages into them; readers get
+a /books index and per-book catalogs at /book/{slug}, and chapter pages show previous/next navigation.
 
 ## Comments
 
