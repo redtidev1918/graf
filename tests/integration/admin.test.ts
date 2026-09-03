@@ -29,7 +29,7 @@ describe("login & session", () => {
     const cookie = await login();
     const dash = await call(h, { path: "/admin", cookie });
     expect(dash.status).toBe(200);
-    expect(await dash.text()).toContain("Dashboard");
+    expect(await dash.text()).toContain("最近页面");
   });
   it("redirects anonymous visitors to the login page", async () => {
     const res = await call(h, { path: "/admin/pages" });

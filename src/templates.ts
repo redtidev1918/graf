@@ -59,9 +59,9 @@ export function notFoundPage(cfg: Config): string {
   return layout({
     cfg,
     title: "404 - " + cfg.siteName,
-    description: "Page not found",
+    description: "页面不存在",
     bodyClass: "page-404",
-    body: '<main class="wrap center"><h1 class="f404">404</h1><p>This page does not exist.</p><p><a class="btn" href="/">Write something</a></p></main>',
+    body: '<main class="wrap center"><h1 class="f404">404</h1><p>页面不存在或已被删除。</p><p><a class="btn" href="/">去写点什么</a></p></main>',
   });
 }
 
@@ -73,22 +73,22 @@ export function editorPage(cfg: Config, opts: { error?: string | null; action?: 
   const content = note ? note.content || "" : "";
   const action = opts.action || (isEdit ? "" : "/publish");
   const err = opts.error ? '<div class="alert">' + esc(opts.error) + "</div>" : "";
-  const submitLabel = isEdit ? "Save" : "Publish";
+  const submitLabel = isEdit ? "保存" : "发布";
   const parts: string[] = [];
   parts.push('<main class="wrap editor-page">');
-  if (isEdit) parts.push('<a class="back" href="/' + esc((note as { path?: string }).path || "") + '/">&larr; back to page</a>');
+  if (isEdit) parts.push('<a class="back" href="/' + esc((note as { path?: string }).path || "") + '/">&larr; 返回页面</a>');
   parts.push(err);
   parts.push('<form method="post" action="' + esc(action) + '" class="editor">');
-  parts.push('<input type="text" name="title" maxlength="200" placeholder="Title" value="' + esc(title) + '">');
-  parts.push('<input type="text" name="author" maxlength="100" placeholder="Author (optional)" value="' + esc(author) + '">');
-  parts.push('<textarea name="content" placeholder="Write in Markdown…">' + esc(content) + "</textarea>");
+  parts.push('<input type="text" name="title" maxlength="200" placeholder="标题" value="' + esc(title) + '">');
+  parts.push('<input type="text" name="author" maxlength="100" placeholder="作者（可选）" value="' + esc(author) + '">');
+  parts.push('<textarea name="content" placeholder="用 Markdown 书写…">' + esc(content) + "</textarea>");
   parts.push('<div class="row-end"><button class="btn" type="submit">' + submitLabel + "</button></div>");
   parts.push("</form>");
   parts.push("</main>");
   return layout({
     cfg,
-    title: (isEdit ? "Edit - " : "New post - ") + cfg.siteName,
-    description: cfg.siteName + " - minimal publishing",
+    title: (isEdit ? "编辑 - " : "新建 - ") + cfg.siteName,
+    description: cfg.siteName + " · 极简发布",
     bodyClass: "editor-body",
     body: parts.join("\n"),
   });
@@ -102,7 +102,7 @@ export function notePage(cfg: Config, opts: { contentHtml: string; meta: { title
   headerParts.push('<div class="meta">' + esc(opts.meta.dateLabel) + "</div>");
   headerParts.push("</header>");
   const editBar = opts.canEdit
-    ? '<div class="edit-bar"><button class="linklike" data-copy-edit data-url="' + esc(opts.meta.canonical) + '?token=' + esc(opts.editToken || "") + '">Copy edit link</button> <a class="btn btn-sm" href="/' + esc(opts.path) + '/edit">Edit</a></div>'
+    ? '<div class="edit-bar"><button class="linklike" data-copy-edit data-url="' + esc(opts.meta.canonical) + '?token=' + esc(opts.editToken || "") + '">复制编辑链接</button> <a class="btn btn-sm" href="/' + esc(opts.path) + '/edit">编辑</a></div>'
     : "";
   const comments = cfg.enableComments
     ? '<script defer src="/js/paranote.js" data-site-id="' + esc(cfg.siteId) + '" data-api-base=""></script>'

@@ -55,7 +55,7 @@ describe("edit token semantics", () => {
     expect(cookieOf(res, "edit_token_" + path)).toBe(token);
     // canonical view now carries editing rights
     const after = await call(h, { path: "/" + path + "/", cookie: "edit_token_" + path + "=" + token });
-    expect(await after.text()).toContain("Edit");
+    expect(await after.text()).toContain("编辑");
   });
   it("GET /path/edit?token= persists the cookie so the form POST works", async () => {
     const { path, token } = await publish();

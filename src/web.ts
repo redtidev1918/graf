@@ -64,7 +64,7 @@ export async function publishPage(c: ReqCtx): Promise<Response> {
   const linkTarget = form.get("link_target") === "_blank" ? "_blank" : "_self";
   if (content.length === 0) return redir("/");
   if (content.length > c.cfg.maxPageLength) {
-    return html(editorPage(c.cfg, { error: "Content exceeds the limit of " + c.cfg.maxPageLength + " characters." }), 400);
+    return html(editorPage(c.cfg, { error: "内容超过 " + c.cfg.maxPageLength + " 字符上限。" }), 400);
   }
   const page = await db.createPage(c.env.DB, {
     path: randomPath(),
@@ -121,12 +121,12 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
 
   // meta
   const lines = page.content.split("\n");
-  let metaTitle = page.title || cfgSite(c.cfg) + " page";
+  let metaTitle = page.title || cfgSite(c.cfg) + " · 页面";
   if (!page.title && lines.length) {
     const cand = lines[0]!.replace(/^#+\s*/, "").trim();
     if (cand) metaTitle = cand.slice(0, 120);
   }
-  const metaDescription = page.author ? "By " + page.author + ". " + plainSnippet(page.content, 180) : plainSnippet(page.content, 180);
+  const metaDescription = page.author ? "作者 " + page.author + " · " + plainSnippet(page.content, 180) : plainSnippet(page.content, 180);
   const image = firstImage(page.content);
 
   let res = html(
@@ -200,7 +200,7 @@ export async function editPageWeb(c: ReqCtx, path: string): Promise<Response> {
       return res;
     }
     if (content.length > c.cfg.maxPageLength) {
-      return html(editorPage(c.cfg, { isEdit: true, error: "Content exceeds the limit of " + c.cfg.maxPageLength + " characters.", action: "/" + page.path + "/edit", note: { title: page.title, author: page.author, content } }), 400);
+      return html(editorPage(c.cfg, { isEdit: true, error: "内容超过 " + c.cfg.maxPageLength + " 字符上限。", action: "/" + page.path + "/edit", note: { title: page.title, author: page.author, content } }), 400);
     }
   }
   const editRes = html(

@@ -64,21 +64,21 @@ function redir(to: string): Response {
 function adminShell(cfg: Config, title: string, body: string, active = ""): string {
   const nav: string[] = [];
   const links: Array<[string, string, string]> = [
-    ["/admin", "Dashboard", "dash"],
-    ["/admin/pages", "Pages", "pages"],
-    ["/admin/comments", "Comments", "comments"],
+    ["/admin", "看板", "dash"],
+    ["/admin/pages", "页面", "pages"],
+    ["/admin/comments", "评论", "comments"],
   ];
   for (const [href, label, key] of links) {
     nav.push('<a href="' + href + '" class="' + (key === active ? "on" : "") + '">' + label + "</a>");
   }
   return layout({
     cfg,
-    title: title + " - " + cfg.siteName + " admin",
+    title: title + " - " + cfg.siteName + " 后台",
     description: "Admin",
     bodyClass: "admin",
     body:
       '<nav class="admin-nav wrap">' + nav.join(" ") +
-      '<form method="post" action="/admin/logout" class="inline"><button class="btn btn-sm ghost" type="submit">Log out</button></form>' +
+      '<form method="post" action="/admin/logout" class="inline"><button class="btn btn-sm ghost" type="submit">退出登录</button></form>' +
       "</nav>" +
       '<main class="wrap admin-main">' + body + "</main>" +
       '<script src="/js/admin.js" defer></script>',
@@ -88,21 +88,21 @@ function adminShell(cfg: Config, title: string, body: string, active = ""): stri
 function loginPage(cfg: Config, message: string | null): string {
   const note = adminEnabled(cfg)
     ? ""
-    : '<p class="alert">Admin is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD (environment/secret) first.</p>';
+    : '<p class="alert">后台未配置：请先设置 ADMIN_USERNAME / ADMIN_PASSWORD（环境变量或 Secret）。</p>';
   const err = message ? '<p class="alert">' + esc(message) + "</p>" : "";
   return layout({
     cfg,
-    title: "Admin login - " + cfg.siteName,
+    title: "后台登录 - " + cfg.siteName,
     description: "Admin login",
     bodyClass: "admin",
     body:
       '<main class="wrap center narrow">' +
-      '<h1 class="brand">' + esc(cfg.siteName) + " admin</h1>" +
+      '<h1 class="brand">' + esc(cfg.siteName) + " 后台</h1>" +
       note + err +
       '<form method="post" action="/admin/login" class="stack">' +
-      '<input type="text" name="username" placeholder="Username" autocomplete="username">' +
-      '<input type="password" name="password" placeholder="Password" autocomplete="current-password">' +
-      '<button class="btn" type="submit">Sign in</button>' +
+      '<input type="text" name="username" placeholder="用户名" autocomplete="username">' +
+      '<input type="password" name="password" placeholder="密码" autocomplete="current-password">' +
+      '<button class="btn" type="submit">登录</button>' +
       "</form></main>",
   });
 }
@@ -161,7 +161,7 @@ export async function routeAdmin(c: ReqCtx): Promise<Response> {
   if (path === "/admin/actions/delete-comment") return deleteCommentAction(c);
   if (path === "/admin/export") return exportData(c);
   if (path === "/admin/import") return importData(c);
-  return html(adminShell(c.cfg, "Not found", "<p>Not found.</p>"), 404);
+  return html(adminShell(c.cfg, "Not found", "<p>未找到。</p>"), 404);
 }
 
 
@@ -191,7 +191,7 @@ async function dashboard(c: ReqCtx): Promise<Response> {
   ]);
   const rows = recent
     .map((p) => {
-      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-page" data-confirm="Delete this page?"><input type="hidden" name="path" value="' + esc(p.path) + '"><button class="btn btn-sm danger" type="submit">Delete</button></form>';
+      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-page" data-confirm="确定删除该页面？"><input type="hidden" name="path" value="' + esc(p.path) + '"><button class="btn btn-sm danger" type="submit">删除</button></form>';
       return (
         '<tr><td><a href="/' + esc(p.path) + '/">' + esc(p.path) + '</a></td>' +
         '<td>' + esc(p.title || "(untitled)") + '</td>' +
@@ -204,18 +204,18 @@ async function dashboard(c: ReqCtx): Promise<Response> {
     .join("");
   const body =
     '<div class="stat-row">' +
-    '<div class="stat"><b>' + pages + "</b><span>pages</span></div>" +
-    '<div class="stat"><b>' + comments + "</b><span>comments</span></div>" +
-    '<div class="stat"><b>' + accounts + "</b><span>accounts</span></div>" +
+    '<div class="stat"><b>' + pages + "</b><span>页面</span></div>" +
+    '<div class="stat"><b>' + comments + "</b><span>评论</span></div>" +
+    '<div class="stat"><b>' + accounts + "</b><span>账号</span></div>" +
     "</div>" +
-    '<p class="row-end"><a class="btn btn-sm" href="/admin/export">Export JSON</a> ' +
-    '<a class="btn btn-sm ghost" href="/admin/import">Import JSON</a></p>' +
+    '<p class="row-end"><a class="btn btn-sm" href="/admin/export">导出 JSON</a> ' +
+    '<a class="btn btn-sm ghost" href="/admin/import">导入 JSON</a></p>' +
     '<p class="alert" style="background:#fffbeb;color:#92400e;border-color:#fde68a">备份包含编辑令牌(edit_token)，请安全保存；不含账号 access_token 与访客原始 IP。</p>' +
-    "<h2>Recent pages</h2>" +
+    "<h2>最近页面</h2>" +
     '<table class="table"><thead><tr><th>Path</th><th>Title</th><th>Author</th><th>Views</th><th>Created</th><th></th></tr></thead><tbody>' +
     rows +
     "</tbody></table>" +
-    '<p><a class="btn btn-sm ghost" href="/admin/pages">Browse / search all pages</a></p>';
+    '<p><a class="btn btn-sm ghost" href="/admin/pages">浏览 / 搜索全部页面</a></p>';
   return html(adminShell(c.cfg, "Dashboard", body, "dash"));
 }
 
@@ -228,25 +228,25 @@ async function pagesList(c: ReqCtx): Promise<Response> {
   const hasMore = fetched.length > PAGE_SIZE;
   const rows = pages
     .map((p) => {
-      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-page" data-confirm="Delete this page?"><input type="hidden" name="path" value="' + esc(p.path) + '"><button class="btn btn-sm danger" type="submit">Delete</button></form>';
+      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-page" data-confirm="确定删除该页面？"><input type="hidden" name="path" value="' + esc(p.path) + '"><button class="btn btn-sm danger" type="submit">删除</button></form>';
       return (
         '<tr><td><a href="/' + esc(p.path) + '/">' + esc(p.path) + '</a></td>' +
         '<td>' + esc(p.title || "(untitled)") + '</td>' +
         '<td>' + esc(p.author || "") + '</td>' +
         '<td>' + p.views + '</td>' +
         '<td>' + fmtTime(p.created_at) + '</td>' +
-        '<td><a class="btn btn-sm ghost" href="/' + esc(p.path) + '/edit">Edit</a> ' + delForm + '</td></tr>'
+        '<td><a class="btn btn-sm ghost" href="/' + esc(p.path) + '/edit">编辑</a> ' + delForm + '</td></tr>'
       );
     })
     .join("");
   const pager =
     '<p class="row">' +
-    (page > 0 ? '<a class="btn btn-sm ghost" href="/admin/pages?q=' + encodeURIComponent(q) + '&p=' + (page - 1) + '">← Prev</a> ' : "") +
-    (hasMore ? '<a class="btn btn-sm ghost" href="/admin/pages?q=' + encodeURIComponent(q) + '&p=' + (page + 1) + '">Next →</a>' : "") +
+    (page > 0 ? '<a class="btn btn-sm ghost" href="/admin/pages?q=' + encodeURIComponent(q) + '&p=' + (page - 1) + '">← 上一页</a> ' : "") +
+    (hasMore ? '<a class="btn btn-sm ghost" href="/admin/pages?q=' + encodeURIComponent(q) + '&p=' + (page + 1) + '">下一页 →</a>' : "") +
     " <span class=\"dim\">第 " + (page + 1) + " 页（每页 " + PAGE_SIZE + " 条）</span></p>";
   const body =
-    '<h1>Pages</h1>' +
-    '<form method="get" class="row"><input type="search" name="q" value="' + esc(q) + '" placeholder="search path / title / author"><input type="hidden" name="p" value="' + page + '"><button class="btn btn-sm" type="submit">Search</button></form>' +
+    '<h1>页面</h1>' +
+    '<form method="get" class="row"><input type="search" name="q" value="' + esc(q) + '" placeholder="搜索 path / 标题 / 作者"><input type="hidden" name="p" value="' + page + '"><button class="btn btn-sm" type="submit">Search</button></form>' +
     '<table class="table"><thead><tr><th>Path</th><th>Title</th><th>Author</th><th>Views</th><th>Created</th><th></th></tr></thead><tbody>' +
     rows +
     "</tbody></table>" +
@@ -282,7 +282,7 @@ async function commentsMod(c: ReqCtx): Promise<Response> {
   }
   const rows = list
     .map((cm) => {
-      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-comment" data-confirm="Delete this comment?"><input type="hidden" name="id" value="' + cm.id + '"><button class="btn btn-sm danger" type="submit">Delete</button></form>';
+      const delForm = '<form class="inline" method="post" action="/admin/actions/delete-comment" data-confirm="确定删除该评论？"><input type="hidden" name="id" value="' + cm.id + '"><button class="btn btn-sm danger" type="submit">删除</button></form>';
       return (
         '<tr><td>' + esc(cm.user_name) + '<br><small>' + esc(cm.user_id || cm.ip || "") + '</small></td>' +
         '<td>' + escSnippet(cm.content) + '</td>' +
@@ -295,12 +295,12 @@ async function commentsMod(c: ReqCtx): Promise<Response> {
     .join("");
   const pager =
     '<p class="row">' +
-    (page > 0 ? '<a class="btn btn-sm ghost" href="/admin/comments?siteId=' + encodeURIComponent(siteId) + '&workId=' + encodeURIComponent(workId) + '&p=' + (page - 1) + '">← Prev</a> ' : "") +
-    (hasMore ? '<a class="btn btn-sm ghost" href="/admin/comments?siteId=' + encodeURIComponent(siteId) + '&workId=' + encodeURIComponent(workId) + '&p=' + (page + 1) + '">Next →</a>' : "") +
+    (page > 0 ? '<a class="btn btn-sm ghost" href="/admin/comments?siteId=' + encodeURIComponent(siteId) + '&workId=' + encodeURIComponent(workId) + '&p=' + (page - 1) + '">← 上一页</a> ' : "") +
+    (hasMore ? '<a class="btn btn-sm ghost" href="/admin/comments?siteId=' + encodeURIComponent(siteId) + '&workId=' + encodeURIComponent(workId) + '&p=' + (page + 1) + '">下一页 →</a>' : "") +
     " <span class=\"dim\">第 " + (page + 1) + " 页（每页 " + PAGE_SIZE + " 条）</span></p>";
   const body =
-    '<h1>Comments</h1>' +
-    '<form method="get" class="row"><input type="text" name="siteId" value="' + esc(siteId) + '" placeholder="siteId"><input type="text" name="workId" value="' + esc(workId) + '" placeholder="workId (page path)"><button class="btn btn-sm" type="submit">Filter</button></form>' +
+    '<h1>评论</h1>' +
+    '<form method="get" class="row"><input type="text" name="siteId" value="' + esc(siteId) + '" placeholder="siteId"><input type="text" name="workId" value="' + esc(workId) + '" placeholder="workId（页面 path）"><button class="btn btn-sm" type="submit">筛选</button></form>' +
     '<table class="table"><thead><tr><th>User</th><th>Comment</th><th>Location</th><th>Likes</th><th>Time</th><th></th></tr></thead><tbody>' +
     rows +
     "</tbody></table>" +
@@ -412,38 +412,38 @@ function parseBackup(raw: unknown, cfg: Config): { pages: db.BackupPage[]; comme
 async function importData(c: ReqCtx): Promise<Response> {
   if (c.request.method === "GET") {
     const body =
-      "<h1>Import JSON backup</h1>" +
+      "<h1>导入 JSON 备份</h1>" +
       "<p>POST this page with the backup as the raw JSON body, or run:</p>" +
       "<pre>curl -X POST -H \"Content-Type: application/json\" --cookie \"graf_admin=...\" --data-binary @backup.json " +
       esc(c.cfg.baseUrl || (c.url.origin + "/admin/import")) + "</pre>" +
       "<p>备份格式: { \"format\": \"graf-backup\", \"version\": 1, \"pages\": [...], \"comments\": [...] }。<br>" +
       "导入是原子的：任何一行非法都会整批回滚（合法行先被完整校验）；页面按 path 幂等 upsert，评论按内容去重。" +
       "备份含编辑令牌，请仅在可信网络传输。</p>" +
-      '<p><a class="btn btn-sm ghost" href="/admin">Back</a></p>';
+      '<p><a class="btn btn-sm ghost" href="/admin">返回</a></p>';
     return html(adminShell(c.cfg, "Import", body));
   }
   let raw: unknown;
   try {
     raw = JSON.parse(await c.request.text());
   } catch {
-    return html(adminShell(c.cfg, "Import error", '<p class="alert">JSON 解析失败：请上传合法 JSON。</p>'), 400);
+    return html(adminShell(c.cfg, "导入失败", '<p class="alert">JSON 解析失败：请上传合法 JSON。</p>'), 400);
   }
   const parsed = parseBackup(raw, c.cfg);
   if (parsed.error) {
-    return html(adminShell(c.cfg, "Import error", '<p class="alert">' + esc(parsed.error) + "</p>"), 400);
+    return html(adminShell(c.cfg, "导入失败", '<p class="alert">' + esc(parsed.error) + "</p>"), 400);
   }
   try {
     const inserted = await db.importBackup(c.env.DB, parsed.pages, parsed.comments);
     const body =
-      "<h1>Import finished</h1>" +
+      "<h1>导入完成</h1>" +
       "<p>本次新增写入: pages <b>" + inserted.pages + "</b>, comments <b>" + inserted.comments + "</b>；" +
       "跳过非法行: <b>" + parsed.skipped + "</b>（重复导入的页面/评论会被幂等合并，不会重复计数）。</p>" +
       "<p>说明: 点赞计数随备份保留，但点赞明细(like_records)不导出，恢复后访客可重新点赞。</p>" +
-      '<p><a class="btn btn-sm" href="/admin">Dashboard</a></p>';
+      '<p><a class="btn btn-sm" href="/admin">返回看板</a></p>';
     return html(adminShell(c.cfg, "Import", body));
   } catch (e) {
     return html(
-      adminShell(c.cfg, "Import error", '<p class="alert">导入失败（已回滚）: ' + esc(e instanceof Error ? e.message : String(e)) + "</p>"),
+      adminShell(c.cfg, "导入失败", '<p class="alert">导入失败（已回滚）: ' + esc(e instanceof Error ? e.message : String(e)) + "</p>"),
       400,
     );
   }
