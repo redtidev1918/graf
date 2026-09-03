@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderMarkdown, youtubeIdOf } from "../src/markdown/render";
+import { renderMarkdown, youtubeIdOf } from "../../src/markdown/render";
 
 const NL = "\n";
 

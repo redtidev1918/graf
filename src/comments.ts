@@ -1,6 +1,6 @@
 // ParaNote-compatible comment endpoints (port of the legacy Django implementation).
 import type { Config, Env } from "./config";
-import { json, str, toInt, nowIso, clientIp, readParams } from "./util";
+import { json, str, toInt, nowIso, clientIp, readParams, sameOriginOk } from "./util";
 import { validateId } from "./ids";
 import { commentUserId, verifySession, ADMIN_COOKIE, getCookie } from "./auth";
 import { timingSafeEqualStr } from "./util";
@@ -186,7 +186,7 @@ export async function apiLikeComment(c: CommentCtx): Promise<Response> {
     if (ip) {
       const since = new Date(Date.now() - 60_000).toISOString();
       const recent = await db.countLikesByIpSince(c.env.DB, ip, since);
-      if (recent >= 60) return json({ error: "rate_limited" }, 429);
+      if (recent >= c.cfg.maxLikesPerMinute) return json({ error: "rate_limited" }, 429);
     }
     const uid = c.cfg.secret ? await commentUserId(ip, siteId, c.cfg.secret) : "ip_" + ip;
     const res = await db.addLike(c.env.DB, comment.id, uid, ip, nowIso());
@@ -200,13 +200,16 @@ export async function apiLikeComment(c: CommentCtx): Promise<Response> {
 
 export async function apiBan(c: CommentCtx): Promise<Response> {
   if (!c.cfg.enableComments) return commentsDisabled();
+  const method = c.request.method;
+  if (method !== "GET" && !sameOriginOk(c.request, new URL(c.request.url))) {
+    return json({ error: "origin_mismatch" }, 403);
+  }
   const isAdmin = await adminOf(c);
   if (!isAdmin) return json({ error: "permission_denied", message: "Admins only" }, 403);
 
   const siteId = (str(c.params.siteId) || "").trim();
   if (!siteId) return badReq("missing_params");
   if (!validateId(siteId)) return badReq("invalid_id_format");
-  const method = c.request.method;
 
   if (method === "GET") {
     const bans = await db.bansBySite(c.env.DB, siteId);

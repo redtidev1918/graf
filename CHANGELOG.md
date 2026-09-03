@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.0.1] - 2026-09-03
+
+Stabilization pass: data-integrity, security and contract hardening on the existing
+architecture (no refactor). Tests grew from 25 to 88 (SQLite-backed route-level tests).
+
+### Fixed
+
+- Page deletion no longer leaves orphan comments/likes (atomic cleanup order).
+- Comment deletion removes its likes atomically.
+- Backups: validated schema, atomic batch import, idempotent pages/comments, no raw IPs
+  or access tokens exported, credential warning shown on /admin.
+- Edit-token flow: ?token= now 303s to the clean URL after granting the cookie; GET on the
+  edit page persists the cookie so form POST works; token no longer lingers in URLs.
+- Admin: open-redirect fixed (login next allowlist), CSRF origin guard for cookie-authenticated
+  mutations, lightweight login brute-force throttle, pagination for pages/comments lists.
+- SECRET is now enforced when comments/admin are enabled (fail-fast misconfiguration page).
+- HEAD requests mirror GET without mutating views; HTML GET is the only view counter.
+- Telegraph API input validation: title/author limits, node depth/count limits, oversized JSON.
+- deploy.mjs --dry-run no longer requires Cloudflare credentials.
+
+### Added
+
+- Contract tests for Telegraph API (21) and ParaNote (10); integration tests for admin (13),
+  web flows (13), data integrity, config semantics and backup round-trip (SQLite adapter).
+- Migration 0002: comment dedupe index for idempotent imports.
+- Env knobs: COMMENT_RATE_LIMIT, LIKE_RATE_LIMIT.
+
 All notable changes to **Graf** are documented here. The project follows semantic versioning;
 releases are tagged `vX.Y.Z` in this repository.
 

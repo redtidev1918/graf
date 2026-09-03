@@ -1,5 +1,27 @@
 # 变更记录（中文）
 
+## [1.0.1] - 2026-09-03
+
+稳定性加固：在现有架构上完成数据一致性、安全与契约测试（无重构），测试从 25 增至 88（基于 SQLite 的路由级测试）。
+
+### 修复
+
+- 页面删除不再遗留孤儿评论/点赞（原子清理顺序）。
+- 评论删除原子地移除其点赞。
+- 备份：schema 校验、原子批量导入、页面/评论幂等、不导出原始 IP 与 access_token、/admin 显示凭据警告。
+- 编辑令牌：?token= 授权后 303 跳转到干净 URL；编辑页 GET 持久化 cookie 使表单 POST 可用。
+- 后台：登录 next 开放重定向修复、Cookie 变更请求来源(CSRF)校验、轻量登录暴力破解限流、页面/评论分页。
+- SECRET 在评论或后台启用时强制（配置错误页面 fail-fast）。
+- HEAD 请求镜像 GET 且不增加浏览量；仅 HTML GET 计数。
+- Telegraph API 输入校验：标题/作者长度、节点深度/数量、超大 JSON。
+- deploy.mjs --dry-run 不再需要 Cloudflare 凭据。
+
+### 新增
+
+- Telegraph(21)/ParaNote(10) 契约测试；admin(13)/web(13)/数据一致性/配置语义/备份往返集成测试（SQLite 适配器）。
+- 迁移 0002：评论去重索引。
+- 环境变量：COMMENT_RATE_LIMIT、LIKE_RATE_LIMIT。
+
 Graf 的显著变更记录于此。遵循语义化版本，Release 以 vX.Y.Z 打 tag。
 
 ## [1.0.0] - 2026-09-03

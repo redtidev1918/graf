@@ -98,6 +98,15 @@ if (FL.help) {
 function getRoot() {
   return path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 }
+function dbIdPresent() {
+  try {
+    const toml = fs.readFileSync(path.join(ROOT, 'wrangler.toml'), 'utf8');
+    const id = (toml.match(/database_id\s*=\s*"([^"]+)"/) || [])[1] || '';
+    return !!id && !/REPLACE/i.test(id);
+  } catch {
+    return false;
+  }
+}
 const ROOT = getRoot();
 
 /** spawn a command; streams output; returns {code, out} */
@@ -193,6 +202,22 @@ async function main() {
   if (Number(process.versions.node.split('.')[0]) < 18) fail('Node.js >= 18 是必需的, 当前 ' + process.version);
   if (!fs.existsSync(path.join(ROOT, 'wrangler.toml'))) fail('未找到 wrangler.toml, 请在仓库根目录运行本脚本');
   ok('仓库目录: ' + ROOT);
+
+  /* 1b. dry-run: offline rehearsal only (no Cloudflare interaction needed) */
+  if (FL.dryRun) {
+    console.log('');
+    console.log(c.cyan('  [dry-run] 演练计划（不会触碰 Cloudflare）'));
+    console.log('    · 前置检查 ............ 通过');
+    console.log('    · D1 数据库 ........... ' + (dbIdPresent() ? '已配置' : '将自动创建并回填 wrangler.toml'));
+    console.log('    · Secret .............. 将写入 SECRET / ADMIN_USERNAME / ADMIN_PASSWORD');
+    console.log('    · 迁移 ................ npx wrangler d1 migrations apply --remote');
+    console.log('    · 自检 ................ typecheck + tests');
+    console.log('    · 部署 ................ npx wrangler deploy');
+    console.log('');
+    console.log(c.dim('  完整执行时仍需一次性 Cloudflare 登录: npx wrangler login'));
+    info('(--dry-run) 演练结束');
+    process.exit(0);
+  }
 
   /* 2. Cloudflare 登录 */
   step('Cloudflare 登录检查');

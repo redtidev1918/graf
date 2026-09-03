@@ -94,11 +94,28 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
   const page = await db.pageByPath(c.env.DB, path);
   if (!page) return html(notFoundPage(c.cfg), 404);
 
-  const canEdit = await editCookieOrToken(c, page);
-  const qToken = c.url.searchParams.get("token");
+  const origin = c.cfg.baseUrl || c.url.origin;
+  const canonical = origin + "/" + page.path + "/";
+  const isHead = c.request.headers.get("x-graf-head") === "1";
 
-  // bump view counter (cheap; keep parity with the Django version)
-  await db.incrementViews(c.env.DB, page.id).catch(() => {});
+  const cookieToken = getCookie(c.request, editCookieName(page.path));
+  const cookieOk = !!cookieToken && (await timingSafeEqualStr(cookieToken, page.edit_token).catch(() => false));
+  const qToken = c.url.searchParams.get("token");
+  const qOk = !!qToken && (await timingSafeEqualStr(qToken, page.edit_token).catch(() => false));
+  const canEdit = cookieOk || qOk;
+
+  // A valid ?token= grants the cookie, then we move the user to the clean URL so the
+  // secret never lingers in the address bar / history / Referer.
+  if (!isHead && c.request.method === "GET" && qOk && !cookieOk) {
+    const rr = redir(canonical);
+    rr.headers.append("Set-Cookie", setEditCookie(c.cfg, c.url, page.path, page.edit_token));
+    return rr;
+  }
+
+  // Count views for real HTML page GETs only (not HEAD probes).
+  if (c.request.method === "GET" && !isHead) {
+    await db.incrementViews(c.env.DB, page.id).catch(() => {});
+  }
 
   const contentHtml = renderMarkdown(page.content, { linkTarget: page.link_target === "_blank" ? "_blank" : "_self" });
 
@@ -111,8 +128,6 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
   }
   const metaDescription = page.author ? "By " + page.author + ". " + plainSnippet(page.content, 180) : plainSnippet(page.content, 180);
   const image = firstImage(page.content);
-  const origin = c.cfg.baseUrl || c.url.origin;
-  const canonical = origin + "/" + page.path + "/";
 
   let res = html(
     notePage(c.cfg, {
@@ -129,14 +144,6 @@ export async function viewPage(c: ReqCtx, path: string): Promise<Response> {
       editToken: canEdit ? page.edit_token : null,
     }),
   );
-
-  // persist edit permission when arriving with a valid ?token=
-  if (!canEdit && qToken) {
-    const ok = await timingSafeEqualStr(qToken, page.edit_token).catch(() => false);
-    if (ok) {
-      res.headers.append("Set-Cookie", setEditCookie(c.cfg, c.url, page.path, page.edit_token));
-    }
-  }
 
   // optional edge caching for anonymous views
   if (c.cfg.cacheTtlSeconds > 0 && !canEdit) {
@@ -164,8 +171,15 @@ export async function editPageWeb(c: ReqCtx, path: string): Promise<Response> {
   if (!validatePath(path)) return html(notFoundPage(c.cfg), 404);
   const page = await db.pageByPath(c.env.DB, path);
   if (!page) return html(notFoundPage(c.cfg), 404);
-  const canEdit = await editCookieOrToken(c, page);
+  const cookieToken = getCookie(c.request, editCookieName(page.path));
+  const cookieOk = !!cookieToken && (await timingSafeEqualStr(cookieToken, page.edit_token).catch(() => false));
+  const qToken = c.url.searchParams.get("token");
+  const qOk = !!qToken && (await timingSafeEqualStr(qToken, page.edit_token).catch(() => false));
+  const canEdit = cookieOk || qOk;
   if (!canEdit) return html(notFoundPage(c.cfg), 404);
+  // Persist the right on the GET so the form POST (no token) works afterwards,
+  // and the secret token leaves the address bar.
+  const persistToken = c.request.method === "GET" && qOk && !cookieOk;
 
   if (c.request.method === "POST") {
     const form = await c.request.formData().catch(() => null);
@@ -189,13 +203,15 @@ export async function editPageWeb(c: ReqCtx, path: string): Promise<Response> {
       return html(editorPage(c.cfg, { isEdit: true, error: "Content exceeds the limit of " + c.cfg.maxPageLength + " characters.", action: "/" + page.path + "/edit", note: { title: page.title, author: page.author, content } }), 400);
     }
   }
-  return html(
+  const editRes = html(
     editorPage(c.cfg, {
       isEdit: true,
       action: "/" + page.path + "/edit",
       note: { title: page.title, author: page.author, content: page.content },
     }),
   );
+  if (persistToken) editRes.headers.append("Set-Cookie", setEditCookie(c.cfg, c.url, page.path, page.edit_token));
+  return editRes;
 }
 
 export function notFoundHtml(cfg: Config): Response {

@@ -26,9 +26,14 @@ async function findPage(params: Record<string, unknown>, urlPath: string | undef
   return path;
 }
 
+const MAX_NODES = 5000;
+const MAX_DEPTH = 10;
+const MAX_JSON_CONTENT = 2_000_000;
+
 function parseContent(raw: unknown): { ok: true; value: unknown[] } | { ok: false; error: string } {
   let nodes: unknown;
   if (typeof raw === "string") {
+    if (raw.length > MAX_JSON_CONTENT) return { ok: false, error: "Content too large" };
     try {
       nodes = JSON.parse(raw);
     } catch {
@@ -38,6 +43,32 @@ function parseContent(raw: unknown): { ok: true; value: unknown[] } | { ok: fals
     nodes = raw;
   }
   if (!Array.isArray(nodes)) return { ok: false, error: "Invalid content format" };
+  let count = 0;
+  const walk = (n: unknown, depth: number): boolean => {
+    if (depth > MAX_DEPTH) return false;
+    if (typeof n === "string") return true;
+    if (!n || typeof n !== "object" || Array.isArray(n)) return false;
+    const o = n as Record<string, unknown>;
+    if (typeof o.tag !== "string" || o.tag.length === 0 || o.tag.length > 64) return false;
+    count++;
+    if (count > MAX_NODES) return false;
+    if (o.attrs !== undefined) {
+      if (typeof o.attrs !== "object" || Array.isArray(o.attrs)) return false;
+      for (const [k, v] of Object.entries(o.attrs as Record<string, unknown>)) {
+        if (typeof v !== "string") (o.attrs as Record<string, string>)[k] = String(v);
+      }
+    }
+    if (o.children !== undefined) {
+      if (!Array.isArray(o.children)) return false;
+      for (const ch of o.children as unknown[]) {
+        if (!walk(ch, depth + 1)) return false;
+      }
+    }
+    return true;
+  };
+  for (const n of nodes) {
+    if (!walk(n, 1)) return { ok: false, error: "Content is too large or malformed" };
+  }
   return { ok: true, value: nodes };
 }
 
@@ -163,11 +194,13 @@ export async function apiCreatePage(d: ApiDeps): Promise<Response> {
   if (d.request.method !== "POST") return bad("POST required", 405);
   const title = str(d.params.title) || "";
   if (!title) return bad("Title is required");
+  if (title.length > 256) return bad("Title is too long");
   const rawContent = d.params.content;
   if (rawContent === undefined || rawContent === null || rawContent === "") return bad("Content is required");
   const parsed = parseContent(rawContent);
   if (!parsed.ok) return bad(parsed.error);
   let authorName = str(d.params.author_name) || "";
+  if (authorName.length > 128) return bad("author_name is too long");
   let accountId: number | null = null;
   const token = str(d.params.access_token) || "";
   if (token) {
@@ -211,6 +244,7 @@ export async function apiEditPage(d: ApiDeps, urlPath?: string): Promise<Respons
   if (!validatePath(path)) return bad("PATH_REQUIRED");
   if (!token) return bad("ACCESS_TOKEN_REQUIRED");
   if (!title) return bad("TITLE_REQUIRED");
+  if (title.length > 256) return bad("TITLE_TOO_LONG");
   if (rawContent === undefined || rawContent === null || rawContent === "") return bad("CONTENT_REQUIRED");
 
   const account = await db.accountByToken(d.env.DB, token);
@@ -224,10 +258,11 @@ export async function apiEditPage(d: ApiDeps, urlPath?: string): Promise<Respons
   const markdown = nodesToMarkdown(parsed.value as Parameters<typeof nodesToMarkdown>[0]);
   if (markdown.length > d.cfg.maxPageLength) return bad("Content too long");
 
-  const authorName = str(d.params.author_name);
+  const authorName = str(d.params.author_name) || "";
+  if (authorName.length > 128) return bad("author_name is too long");
   await db.updatePageContent(d.env.DB, page.id, {
     title,
-    author: authorName ?? page.author,
+    author: authorName || page.author,
     content: markdown,
     link_target: page.link_target,
     updated_at: nowIso(),

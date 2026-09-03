@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { markdownToNodes, nodesToMarkdown } from "../src/markdown/nodes";
+import { markdownToNodes, nodesToMarkdown } from "../../src/markdown/nodes";
 
 const NL = "\n";
 

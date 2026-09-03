@@ -80,7 +80,7 @@ npm run deploy       # 上线（workers.dev 或自定义路由）
 
 | 变量 | 默认 | 说明 |
 |---|---|---|
-| SECRET | 必填 | HMAC 密钥：后台会话与匿名评论身份派生（openssl rand -hex 32） |
+| SECRET | 评论/后台启用时必填（默认都开） | HMAC 密钥：后台会话与匿名评论身份派生（openssl rand -hex 32）；仅当 ENABLE_COMMENTS=false 且未配置 ADMIN_* 时可省略 |
 | SITE_NAME | Graf | 站点名（标题 / Open Graph） |
 | SITE_ID | default | 评论数据命名空间（评论按 site 隔离） |
 | ENABLE_COMMENTS | true | 设为 false 关闭评论 API 与 UI |

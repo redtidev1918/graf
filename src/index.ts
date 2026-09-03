@@ -54,11 +54,39 @@ function splitSegments(p: string): string[] {
   return p.split("/").filter((s) => s.length > 0);
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const pathname = url.pathname;
   const cfg = loadConfig(env);
   const method = request.method;
+
+  // Fail fast on a clearly misconfigured instance instead of serving 500s later.
+  if (cfg.misconfigured) {
+    const msg = cfg.misconfigured;
+    if (pathname.startsWith("/api") || pathname.startsWith("/admin")) {
+      return withSecurity(json({ ok: false, error: "SERVER_MISCONFIGURED", message: msg }, 500));
+    }
+    return withSecurity(
+      new Response(
+        "<!DOCTYPE html><meta charset=utf-8><title>Server misconfigured</title><h1>Server misconfigured</h1><p>" +
+          escapeHtml(msg) +
+          "</p>",
+        { status: 500, headers: { "content-type": "text/html; charset=utf-8" } },
+      ),
+    );
+  }
+
+  // HEAD mirrors GET (body dropped at the end) — never mutates state.
+  if (method === "HEAD") {
+    const asGet = new Request(request, { method: "GET" });
+    asGet.headers.set("x-graf-head", "1");
+    const res = await route(asGet, env);
+    return new Response(null, { status: res.status, headers: res.headers });
+  }
 
   // static assets (workers static assets binding)
   for (const prefix of STATIC_PREFIXES) {

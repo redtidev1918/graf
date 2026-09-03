@@ -63,6 +63,24 @@ async function first<T = Record<string, unknown>>(db: D1Database, sql: string, .
   return rows[0] ?? null;
 }
 
+export interface SqlBatchItem {
+  sql: string;
+  params: SqlValue[];
+}
+
+/** Atomic batch if the binding supports it (D1/SqliteD1), else sequential fallback. */
+export async function batchExec(db: D1Database, items: SqlBatchItem[]): Promise<void> {
+  const candidate = db as unknown as { batch?: (i: SqlBatchItem[]) => Promise<unknown[]> };
+  if (typeof candidate.batch === "function") {
+    // Call as a method so the adapter instance keeps its bindings.
+    await candidate.batch(items);
+    return;
+  }
+  for (const it of items) {
+    await run(db, it.sql, ...it.params);
+  }
+}
+
 // ---------- accounts ----------
 
 export async function accountByToken(db: D1Database, token: string): Promise<AccountRow | null> {
@@ -165,37 +183,103 @@ export async function pagesByAccount(
   const totalRow = await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages WHERE account_id = ?", accountId);
   const pages = await all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE account_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE account_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
     accountId, limit, offset,
   );
   return { pages, total: totalRow?.n ?? 0 };
 }
 
-export async function recentPages(db: D1Database, limit = 30): Promise<PageRow[]> {
+export async function recentPages(db: D1Database, limit = 30, offset = 0): Promise<PageRow[]> {
   return all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages ORDER BY created_at DESC LIMIT ?",
-    limit,
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    limit, offset,
   );
 }
 
-export async function searchPages(db: D1Database, q: string, limit = 200): Promise<PageRow[]> {
+export async function searchPages(db: D1Database, q: string, limit = 200, offset = 0): Promise<PageRow[]> {
   const like = "%" + q + "%";
   return all<PageRow>(
     db,
-    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE path LIKE ? OR title LIKE ? OR author LIKE ? ORDER BY created_at DESC LIMIT ?",
-    like, like, like, limit,
+    "SELECT id, path, title, author, content, link_target, edit_token, account_id, views, created_at, updated_at FROM pages WHERE path LIKE ? OR title LIKE ? OR author LIKE ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    like, like, like, limit, offset,
   );
 }
 
 export async function deletePage(db: D1Database, id: number): Promise<void> {
-  await run(db, "DELETE FROM pages WHERE id = ?", id);
-  await run(db, "DELETE FROM comments WHERE work_id IN (SELECT path FROM pages WHERE id = ?)", id);
+  // Order matters: collect the page path while the page still exists, then remove
+  // like_records -> comments -> page atomically (no orphan comments/likes left behind).
+  await batchExec(db, [
+    {
+      sql: "DELETE FROM like_records WHERE comment_id IN (SELECT id FROM comments WHERE work_id = (SELECT path FROM pages WHERE id = ?))",
+      params: [id],
+    },
+    { sql: "DELETE FROM comments WHERE work_id = (SELECT path FROM pages WHERE id = ?)", params: [id] },
+    { sql: "DELETE FROM pages WHERE id = ?", params: [id] },
+  ]);
 }
 
 export async function countPages(db: D1Database): Promise<number> {
   const row = await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages");
   return row?.n ?? 0;
+}
+
+export interface BackupPage {
+  path: string;
+  title: string;
+  author: string;
+  content: string;
+  link_target: string;
+  edit_token: string;
+  views: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BackupComment {
+  site_id: string;
+  work_id: string;
+  chapter_id: string;
+  para_index: number;
+  content: string;
+  user_name: string;
+  user_id: string | null;
+  user_avatar: string | null;
+  context_text: string | null;
+  likes: number;
+  created_at: string;
+}
+
+/**
+ * Idempotent, atomic backup import. Pages upsert by path; comments use
+ * INSERT OR IGNORE relying on the dedupe index (0002). Either everything
+ * is written (batch transaction) or nothing is.
+ */
+export async function importBackup(db: D1Database, pages: BackupPage[], comments: BackupComment[]): Promise<{ pages: number; comments: number }> {
+  const items: SqlBatchItem[] = [];
+  for (const p of pages) {
+    items.push({
+      sql:
+        "INSERT INTO pages (path, title, author, content, link_target, edit_token, views, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+        "ON CONFLICT(path) DO UPDATE SET title = excluded.title, author = excluded.author, content = excluded.content, " +
+        "link_target = excluded.link_target, edit_token = excluded.edit_token, views = excluded.views, updated_at = excluded.updated_at",
+      params: [p.path, p.title, p.author, p.content, p.link_target, p.edit_token, p.views, p.created_at, p.updated_at],
+    });
+  }
+  for (const cm of comments) {
+    items.push({
+      sql:
+        "INSERT OR IGNORE INTO comments (site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)",
+      params: [cm.site_id, cm.work_id, cm.chapter_id, cm.para_index, cm.content, cm.user_name, cm.user_id, cm.user_avatar, cm.context_text, cm.likes, cm.created_at],
+    });
+  }
+  const beforeComments = (await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM comments"))?.n ?? 0;
+  const beforePages = (await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages"))?.n ?? 0;
+  await batchExec(db, items);
+  const afterComments = (await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM comments"))?.n ?? 0;
+  const afterPages = (await first<{ n: number }>(db, "SELECT COUNT(*) AS n FROM pages"))?.n ?? 0;
+  return { pages: Math.max(0, afterPages - beforePages), comments: Math.max(0, afterComments - beforeComments) };
 }
 
 export async function allPagesForExport(db: D1Database): Promise<PageRow[]> {
@@ -207,7 +291,7 @@ export async function allPagesForExport(db: D1Database): Promise<PageRow[]> {
 export async function commentsByWork(db: D1Database, siteId: string, workId: string, chapterId: string): Promise<CommentRow[]> {
   return all<CommentRow>(
     db,
-    "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments WHERE site_id = ? AND work_id = ? AND chapter_id = ? ORDER BY created_at ASC",
+    "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments WHERE site_id = ? AND work_id = ? AND chapter_id = ? ORDER BY created_at ASC, id ASC",
     siteId, workId, chapterId,
   );
 }
@@ -244,8 +328,10 @@ export async function createComment(db: D1Database, c: NewComment): Promise<Comm
 }
 
 export async function deleteComment(db: D1Database, id: number): Promise<void> {
-  await run(db, "DELETE FROM comments WHERE id = ?", id);
-  await run(db, "DELETE FROM like_records WHERE comment_id = ?", id);
+  await batchExec(db, [
+    { sql: "DELETE FROM like_records WHERE comment_id = ?", params: [id] },
+    { sql: "DELETE FROM comments WHERE id = ?", params: [id] },
+  ]);
 }
 
 export async function countCommentsByIpSince(db: D1Database, ip: string, sinceIso: string): Promise<number> {
@@ -253,18 +339,18 @@ export async function countCommentsByIpSince(db: D1Database, ip: string, sinceIs
   return row?.n ?? 0;
 }
 
-export async function recentComments(db: D1Database, siteId: string | null, limit = 50): Promise<CommentRow[]> {
+export async function recentComments(db: D1Database, siteId: string | null, limit = 50, offset = 0): Promise<CommentRow[]> {
   if (siteId) {
     return all<CommentRow>(
       db,
-      "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments WHERE site_id = ? ORDER BY created_at DESC LIMIT ?",
-      siteId, limit,
+      "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments WHERE site_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+      siteId, limit, offset,
     );
   }
   return all<CommentRow>(
     db,
-    "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments ORDER BY created_at DESC LIMIT ?",
-    limit,
+    "SELECT id, site_id, work_id, chapter_id, para_index, content, user_name, user_id, user_avatar, context_text, ip, likes, created_at FROM comments ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+    limit, offset,
   );
 }
 

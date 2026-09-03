@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { randomPath, randomHex, validatePath, validateId, newEditToken, newAccessToken } from "../src/ids";
+import { randomPath, randomHex, validatePath, validateId, newEditToken, newAccessToken } from "../../src/ids";
 
 describe("ids", () => {
   it("generates 8-char paths matching the path regex", () => {

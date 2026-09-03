@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toBool, plainSnippet, firstImage } from "../src/util";
+import { toBool, plainSnippet, firstImage } from "../../src/util";
 
 describe("util", () => {
   it("parses booleans leniently", () => {

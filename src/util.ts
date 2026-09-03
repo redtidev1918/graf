@@ -97,6 +97,19 @@ export function clientIp(request: Request): string | null {
   return real ? real.trim() : null;
 }
 
+/** CSRF-ish guard: reject obvious cross-site requests for cookie-authenticated mutations. */
+export function sameOriginOk(request: Request, url: URL): boolean {
+  const sfs = request.headers.get("sec-fetch-site");
+  if (sfs) return sfs !== "cross-site";
+  const origin = request.headers.get("origin");
+  if (!origin) return true; // non-browser client (curl / bots) — no ambient cookies
+  try {
+    return new URL(origin).host === url.host;
+  } catch {
+    return false;
+  }
+}
+
 /** Constant-time string comparison to avoid timing side channels. */
 export async function timingSafeEqualStr(a: string, b: string): Promise<boolean> {
   const enc = new TextEncoder();

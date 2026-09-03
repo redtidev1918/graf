@@ -82,7 +82,7 @@ All settings are environment variables ([vars] in wrangler.toml or secrets):
 
 | Variable | Default | Description |
 |---|---|---|
-| SECRET | (required) | HMAC secret for admin sessions and anonymous comment identities. |
+| SECRET | required when comments/admin are on (both on by default) | HMAC secret for admin sessions and anonymous comment identities. Only a stripped instance (ENABLE_COMMENTS=false and no ADMIN_*) may omit it. |
 | SITE_NAME | Graf | Brand shown in titles / Open Graph. |
 | SITE_ID | default | Comment namespace for this site instance. |
 | ENABLE_COMMENTS | true | Set false to disable the comment API and UI. |
