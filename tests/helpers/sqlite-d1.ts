@@ -49,15 +49,20 @@ export class SqliteD1 {
       }),
     };
   }
-  async batch(items: D1BatchItem[]): Promise<unknown[]> {
+  async batch(items: Array<D1BatchItem | { run: () => Promise<unknown> }>): Promise<unknown[]> {
     this.db.exec("BEGIN");
     try {
       const out: unknown[] = [];
       for (const item of items) {
-        const stmt = this.db.prepare(item.sql) as unknown as {
+        if (item && typeof (item as { run?: unknown }).run === "function") {
+          out.push(await (item as { run: () => Promise<unknown> }).run());
+          continue;
+        }
+        const raw = item as D1BatchItem;
+        const stmt = this.db.prepare(raw.sql) as unknown as {
           run: (...args: unknown[]) => { lastInsertRowid: number | bigint; changes: number };
         };
-        const info = stmt.run(...item.params.map(norm));
+        const info = stmt.run(...raw.params.map(norm));
         out.push({ meta: { last_row_id: Number(info.lastInsertRowid), changes: Number(info.changes) } });
       }
       this.db.exec("COMMIT");

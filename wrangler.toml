@@ -23,7 +23,7 @@ CACHE_TTL = "0"
 [[d1_databases]]
 binding = "DB"
 database_name = "graf"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "5de0f150-baa2-47ce-a0a5-063f4e78136f"
 migrations_dir = "migrations"
 
 # 生产必需的密钥放在环境变量/Secret 中:

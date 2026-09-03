@@ -70,10 +70,12 @@ export interface SqlBatchItem {
 
 /** Atomic batch if the binding supports it (D1/SqliteD1), else sequential fallback. */
 export async function batchExec(db: D1Database, items: SqlBatchItem[]): Promise<void> {
-  const candidate = db as unknown as { batch?: (i: SqlBatchItem[]) => Promise<unknown[]> };
+  const candidate = db as unknown as { batch?: (statements: unknown[]) => Promise<unknown[]> };
   if (typeof candidate.batch === "function") {
-    // Call as a method so the adapter instance keeps its bindings.
-    await candidate.batch(items);
+    // Real D1 batch() expects prepared statements (prepare().bind() results),
+    // not raw {sql, params} objects — build them and pass the list in order.
+    const prepared = items.map((it) => db.prepare(it.sql).bind(...it.params));
+    await candidate.batch(prepared);
     return;
   }
   for (const it of items) {
