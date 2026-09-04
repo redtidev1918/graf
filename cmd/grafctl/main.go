@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const version = "0.4.0"
+const version = "0.4.1"
 
 func main() {
 	args := os.Args[1:]
@@ -19,9 +19,24 @@ func main() {
 	}
 	cfg := loadCfg(args)
 	ColorEnabled = isTerminal() && !cfg.NoColor && os.Getenv("NO_COLOR") == ""
+
+	// 顶层帮助/版本标志优先，避免 --help 误触发部署
+	for _, a := range args {
+		switch a {
+		case "-h", "--help":
+			printHelp()
+			return
+		case "-v", "--version":
+			fmt.Println("grafctl v" + version)
+			return
+		}
+	}
+
 	switch cmd {
-	case "help", "-h", "--help":
+	case "help":
 		printHelp()
+	case "version":
+		fmt.Println("grafctl v" + version)
 	case "doctor":
 		if err := runDoctor(cfg); err != nil {
 			fatal(err)
@@ -55,6 +70,7 @@ func printHelp() {
 	fmt.Println("  grafctl deploy --dry-run      演练")
 	fmt.Println("  grafctl auth                  粘贴一次 API Token 并保存(之后无需环境变量)")
 	fmt.Println("  grafctl --help")
+	fmt.Println("  grafctl --version")
 	fmt.Println()
 	fmt.Println("必填环境变量:")
 	fmt.Println("  CLOUDFLARE_API_TOKEN   Cloudflare API Token(Workers + D1 Edit); 也可用 grafctl auth 保存")
