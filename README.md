@@ -120,13 +120,15 @@ BOOKS_ENABLED=true 时启用：在后台「作品」建书并把页面章节按�
 
 ## Go 版一键部署器 grafctl（无需 Node）
 
-从 [Releases](https://github.com/redtidev1918/graf/releases) 下载对应平台二进制（grafctl-v*，Linux/macOS/Windows × amd64/arm64）：
+**零依赖一键**（单二进制；首次 `auth` 粘贴一次 Token 后即无环境变量依赖）：
 
 ```bash
-export CLOUDFLARE_API_TOKEN=你的Token
-grafctl doctor          # 检查账号/D1/迁移
-grafctl deploy --yes    # 全自动部署(建库/迁移/Secrets/上传/自检)
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
+grafctl auth            # 粘贴一次 Cloudflare API Token(保存在 ~/.config/grafctl/config.json)
+grafctl deploy --yes    # 之后一条命令全自动部署
 ```
+
+也可从 [Releases](https://github.com/redtidev1918/graf/releases) 手动下载 Linux/macOS/Windows × amd64/arm64 二进制。
 
 > 与 npm 版 deploy.mjs 功能对等；打 grafctl-v* tag 即触发分平台 Release。
 

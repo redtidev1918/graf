@@ -124,13 +124,15 @@ a /books index and per-book catalogs at /book/{slug}, and chapter pages show pre
 
 ## grafctl — Go deployer (no Node needed)
 
-Download the per-platform binary from [Releases](https://github.com/redtidev1918/graf/releases) (grafctl-v*):
+**Zero-dependency one-click** (single binary; run `auth` once to store the token, then no env vars needed):
 
 ```bash
-export CLOUDFLARE_API_TOKEN=your-token
-grafctl doctor
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
+grafctl auth
 grafctl deploy --yes
 ```
+
+Or download Linux/macOS/Windows × amd64/arm64 binaries manually from [Releases](https://github.com/redtidev1918/graf/releases).
 
 ## Comments
 

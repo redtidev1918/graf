@@ -29,6 +29,10 @@ func main() {
 		if err := runMigrate(cfg); err != nil {
 			fatal(err)
 		}
+	case "auth":
+		if err := runAuth(cfg); err != nil {
+			fatal(err)
+		}
 	case "deploy":
 		if err := runDeploy(cfg); err != nil {
 			fatal(err)
@@ -48,10 +52,11 @@ func printHelp() {
 	fmt.Println("  grafctl migrate               只执行 D1 迁移")
 	fmt.Println("  grafctl deploy                完整部署 (默认)")
 	fmt.Println("  grafctl deploy --dry-run      演练")
+	fmt.Println("  grafctl auth                  粘贴一次 API Token 并保存(之后无需环境变量)")
 	fmt.Println("  grafctl --help")
 	fmt.Println()
 	fmt.Println("必填环境变量:")
-	fmt.Println("  CLOUDFLARE_API_TOKEN   Cloudflare API Token (Workers + D1 编辑权限)")
+	fmt.Println("  CLOUDFLARE_API_TOKEN   Cloudflare API Token(Workers + D1 Edit); 也可用 grafctl auth 保存")
 	fmt.Println("可选环境变量:")
 	fmt.Println("  GRAF_ACCOUNT_ID        账号 ID (缺省取第一个账号)")
 	fmt.Println("  GRAF_WORKER            Worker 名 (默认 graf)")
@@ -105,12 +110,17 @@ func loadCfg(args []string) *Cfg {
 				c.AdminUser = valOr(kv)
 			case "admin-pass":
 				c.AdminPass = valOr(kv)
+			case "token":
+				c.Token = valOr(kv)
 			case "secret":
 				c.Secret = valOr(kv)
 			}
 		}
 	}
-	c.Token = os.Getenv("CLOUDFLARE_API_TOKEN")
+	c.Token = firstNonEmpty(c.Token, os.Getenv("CLOUDFLARE_API_TOKEN"))
+	if c.Token == "" {
+		c.Token = loadSavedToken()
+	}
 	c.Account = firstNonEmpty(c.Account, os.Getenv("GRAF_ACCOUNT_ID"))
 	c.Worker = envOr("GRAF_WORKER", "graf")
 	c.DbName = envOr("GRAF_DB_NAME", "graf")
