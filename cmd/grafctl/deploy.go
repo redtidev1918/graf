@@ -41,6 +41,11 @@ func runDoctor(c *Cfg) error {
 	if err == nil && len(rows) > 0 {
 		info("pages 行数: " + jsonGet(rows[0], "n"))
 	}
+	if st, err := getWorkersDev(cli, c); err == nil {
+		info("worker.dev 访问: enabled=" + st)
+	} else {
+		warn("读取 worker.dev 状态失败: " + err.Error())
+	}
 	ok("doctor 完成")
 	return nil
 }
@@ -167,6 +172,22 @@ func uploadWorker(cli *apiClient, c *Cfg, dbID string, bundle []byte) error {
 	return nil
 }
 
+func getWorkersDev(cli *apiClient, c *Cfg) (string, error) {
+	j, err := cli.get("/accounts/" + cli.account + "/workers/scripts/" + c.Worker + "/subdomain")
+	if err != nil {
+		return "", err
+	}
+	return jsonGet(j, "result", "enabled"), nil
+}
+
+func enableWorkersDev(cli *apiClient, c *Cfg) error {
+	_, err := cli.put("/accounts/"+cli.account+"/workers/scripts/"+c.Worker+"/subdomain", map[string]any{"enabled": true})
+	if err != nil {
+		return fmt.Errorf("开启 worker.dev 失败(需含 Workers 编辑权限的 API Token): %w", err)
+	}
+	return nil
+}
+
 func putSecret(cli *apiClient, c *Cfg, name, value string) error {
 	_, err := cli.put("/accounts/"+cli.account+"/workers/scripts/"+c.Worker+"/secrets", map[string]any{"name": name, "text": value, "type": "secret_text"})
 	if err != nil {
@@ -220,6 +241,13 @@ func runDeploy(c *Cfg) error {
 		return err
 	}
 	ok("Worker " + c.Worker + " 已上传")
+
+	step("开启 worker.dev 访问")
+	if err := enableWorkersDev(cli, c); err != nil {
+		warn(err.Error())
+	} else {
+		ok("worker.dev 已开启: https://" + c.Worker + "." + subdomainOr(cli) + ".workers.dev")
+	}
 
 	step("写入 Secrets")
 	for _, kv := range [][2]string{{"SECRET", secret}, {"ADMIN_USERNAME", adminUser}, {"ADMIN_PASSWORD", adminPass}} {
