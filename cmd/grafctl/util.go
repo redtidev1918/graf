@@ -11,6 +11,16 @@ import (
 
 var logFile *os.File
 
+// ColorEnabled 控制彩色输出(受终端/--no-color/NO_COLOR 约束)
+var ColorEnabled bool
+
+func color(code, s string) string {
+	if !ColorEnabled {
+		return s
+	}
+	return "\x1b[" + code + "m" + s + "\x1b[0m"
+}
+
 func openLog(path string) {
 	if path == "" {
 		return
@@ -27,7 +37,8 @@ func logLine(kind, msg string) {
 	if logFile != nil {
 		_, _ = logFile.WriteString(line)
 	}
-	fmt.Println(kind + " " + msg)
+	codes := map[string]string{"INFO": "90", "OK": "32", "WARN": "33", "STEP": "36", "ERROR": "31", "DEBUG": "2"}
+	fmt.Println(color(codes[kind], kind) + " " + msg)
 }
 
 func info(msg string)  { logLine("ℹ", msg) }

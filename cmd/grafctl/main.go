@@ -18,6 +18,7 @@ func main() {
 		args = args[1:]
 	}
 	cfg := loadCfg(args)
+	ColorEnabled = isTerminal() && !cfg.NoColor && os.Getenv("NO_COLOR") == ""
 	switch cmd {
 	case "help", "-h", "--help":
 		printHelp()
@@ -74,7 +75,7 @@ type Cfg struct {
 	SiteName, SiteID                     string
 	EnableComments, Books, CacheTTL      string
 	MaxPage                              string
-	Yes, DryRun, Debug                   bool
+	Yes, DryRun, Debug, NoColor          bool
 	LogFile                              string
 }
 
@@ -95,6 +96,8 @@ func loadCfg(args []string) *Cfg {
 			c.DryRun = true
 		case a == "--debug":
 			c.Debug = true
+		case a == "--no-color":
+			c.NoColor = true
 		case strings.HasPrefix(a, "--"):
 			kv := strings.SplitN(strings.TrimPrefix(a, "--"), "=", 2)
 			switch kv[0] {
