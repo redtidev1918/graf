@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- grafctl 0.3.0: token persistence (`auth`), auto-enable worker.dev, color-coded logging + `--no-color`, one-line installers (sh + PowerShell `irm | iex`), per-platform release binaries.
+
 ## [1.3.0] - 2026-09-04
 
 ### Added

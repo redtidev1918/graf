@@ -15,6 +15,20 @@ SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./
 镜像内置 Node + wrangler，以本地模式运行 Graf（SQLite 数据存于 graf-data 卷），适合个人/内网；
 对外发布仍推荐 Cloudflare。
 
+## 1c. 零依赖最快路径：grafctl（单二进制）
+
+```bash
+# macOS/Linux
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
+# Windows(PowerShell)
+# irm https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.ps1 | iex
+
+grafctl auth          # 首次粘贴一次 Cloudflare API Token(存到用户配置目录)
+grafctl deploy --yes  # 之后零依赖一键部署(建库→迁移→Secrets→上传→开启worker.dev→自检)
+```
+
+彩色分级输出；`doctor` 自检；`--dry-run`/`--yes`/`--no-color`。
+
 ## 2. 最快路径：一键全自动部署（推荐）
 
 没有克隆过仓库的机器，复制这一行回车即可（自动 clone → 装依赖 → 登录检查 → 建库 →

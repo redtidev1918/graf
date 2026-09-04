@@ -4,8 +4,9 @@ $repo = "redtidev1918/graf"
 $arch = if ($env:PROCESSOR_ARCHITECTURE -match "ARM64|ARM") { "arm64" } else { "amd64" }
 $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest"
 $tag = $latest.tag_name
-$name = "grafctl_\${tag}_windows_\${arch}.zip"
-$url = "https://github.com/$repo/releases/download/\${tag}/\${name}"
+$ver = if ($tag.StartsWith("v")) { $tag.Substring(1) } else { $tag }
+$name = "grafctl_${ver}_windows_${arch}.zip"
+$url = "https://github.com/$repo/releases/download/${tag}/${name}"
 $tmp = Join-Path $env:TEMP ("grafctl-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $tmp | Out-Null
 Write-Host ("==> 下载 " + $name + " ...")

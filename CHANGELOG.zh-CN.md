@@ -1,5 +1,9 @@
 # 变更记录（中文）
 
+## Unreleased
+
+- grafctl 0.3.0：Token 持久化(`auth`)、自动开启 worker.dev、彩色分级日志 + `--no-color`、一键安装脚本(sh 与 PowerShell `irm | iex`)、分平台发布二进制。
+
 ## [1.3.0] - 2026-09-04
 
 ### 新增

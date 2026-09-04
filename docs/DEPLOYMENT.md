@@ -15,6 +15,20 @@ SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' .
 The image bundles Node + wrangler and runs Graf in local mode (SQLite data in the `graf-data` volume).
 Suitable for personal/LAN use; Cloudflare is recommended for public traffic.
 
+## 1c. Zero-dependency path: grafctl (single binary)
+
+```bash
+# macOS/Linux
+curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
+# Windows (PowerShell)
+# irm https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.ps1 | iex
+
+grafctl auth          # paste a Cloudflare API Token once
+ grafctl deploy --yes # zero-dependency deploy afterwards (db -> migrations -> secrets -> upload -> worker.dev -> check)
+```
+
+Color-coded output, `doctor` health check, `--dry-run`/`--yes`/`--no-color`.
+
 ## 2. Fastest path: one-command auto deploy (recommended)
 
 On a machine that does not have the repository yet, paste this single line (it clones the repo,
