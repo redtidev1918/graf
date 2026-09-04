@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- grafctl 0.4.2：开启 worker.dev 改用 POST（此前 PUT 返回 405）；自检在本地网络无法直连 worker.dev 时不再误报「网络失败」。
 - grafctl 0.4.1：D1 迁移 + Worker bundle 内嵌进二进制（真正单文件，无需克隆仓库/Node/npm）；`--help`/`--version` 不再误触发部署；默认用内嵌 bundle，`GRAF_BUNDLE` 可覆盖。
 - grafctl 0.3.0：Token 持久化(`auth`)、自动开启 worker.dev、彩色分级日志 + `--no-color`、一键安装脚本(sh 与 PowerShell `irm | iex`)、分平台发布二进制。
 

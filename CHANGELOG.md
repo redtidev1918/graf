@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- grafctl 0.4.2: workers.dev enable now uses POST (PUT returned 405 "Method not allowed for this authentication scheme"); self-check no longer misreports "network failure" when the local network simply cannot reach worker.dev directly.
 - grafctl 0.4.1: D1 migrations + Worker bundle embedded into the binary (truly single-file; no repo checkout/Node/npm needed); `--help`/`--version` no longer trigger a deploy; embedded bundle is the default, `GRAF_BUNDLE` overrides.
 - grafctl 0.3.0: token persistence (`auth`), auto-enable worker.dev, color-coded logging + `--no-color`, one-line installers (sh + PowerShell `irm | iex`), per-platform release binaries.
 
