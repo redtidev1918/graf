@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
+	"io/fs"
 	"sort"
 	"strings"
+
+	assets "github.com/redtidev1918/graf"
 )
 
 func findD1(cli *apiClient, name string) (string, error) {
@@ -104,8 +105,8 @@ func d1HasColumn(cli *apiClient, dbID, table, col string) (bool, error) {
 	return len(rows) > 0, nil
 }
 
-func listMigrations(dir string) ([]string, error) {
-	entries, err := os.ReadDir(dir)
+func listMigrations() ([]string, error) {
+	entries, err := fs.ReadDir(assets.Migrations, "migrations")
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +168,7 @@ func migrationNeeded(cli *apiClient, dbID, name string, applied map[string]bool)
 }
 
 func runMigrations(cli *apiClient, c *Cfg, dbID string) error {
-	files, err := listMigrations("migrations")
+	files, err := listMigrations()
 	if err != nil {
 		return fmt.Errorf("读取迁移目录: %w", err)
 	}
@@ -186,7 +187,7 @@ func runMigrations(cli *apiClient, c *Cfg, dbID string) error {
 	}
 	count := 0
 	for _, name := range files {
-		content, err := os.ReadFile(filepath.Join("migrations", name))
+		content, err := assets.Migrations.ReadFile("migrations/" + name)
 		if err != nil {
 			return err
 		}

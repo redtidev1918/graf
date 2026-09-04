@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- grafctl 0.4.0: D1 migrations + Worker bundle embedded into the binary (truly single-file; no repo checkout/Node/npm needed); embedded bundle is the default, `GRAF_BUNDLE` overrides.
 - grafctl 0.3.0: token persistence (`auth`), auto-enable worker.dev, color-coded logging + `--no-color`, one-line installers (sh + PowerShell `irm | iex`), per-platform release binaries.
 
 ## [1.3.0] - 2026-09-04

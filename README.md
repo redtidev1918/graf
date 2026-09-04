@@ -120,11 +120,11 @@ BOOKS_ENABLED=true 时启用：在后台「作品」建书并把页面章节按�
 
 ## Go 版一键部署器 grafctl（无需 Node）
 
-**零依赖一键**（单二进制；首次 `auth` 粘贴一次 Token 后即无环境变量依赖）：
+**零依赖一键**（单二进制，内嵌迁移与 Worker bundle，无需克隆仓库/Node/npm；首次 `auth` 粘贴一次 Token 后即无环境变量依赖）：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
-grafctl auth            # 粘贴一次 Cloudflare API Token(保存在 ~/.config/grafctl/config.json)
+grafctl auth            # 粘贴一次 Cloudflare API Token(保存到用户配置目录)
 grafctl deploy --yes    # 之后一条命令全自动部署
 ```
 

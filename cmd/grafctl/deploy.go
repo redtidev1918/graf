@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	assets "github.com/redtidev1918/graf"
 )
 
 func runDoctor(c *Cfg) error {
@@ -95,11 +97,24 @@ func ensureCreds(c *Cfg) (adminUser, adminPass, secret string, auto bool, err er
 }
 
 func readBundle(c *Cfg) ([]byte, error) {
-	data, err := os.ReadFile(filepath.FromSlash(c.Bundle))
-	if err != nil {
-		return nil, fmt.Errorf("读取 bundle 失败 (%s): %w — 请先构建: npm run build", c.Bundle, err)
+	if c.Bundle != "" {
+		data, err := os.ReadFile(filepath.FromSlash(c.Bundle))
+		if err != nil {
+			return nil, fmt.Errorf("读取 bundle 失败 (%s): %w", c.Bundle, err)
+		}
+		return data, nil
 	}
-	return data, nil
+	if len(assets.WorkerBundle) == 0 {
+		return nil, fmt.Errorf("内嵌 bundle 为空（构建时未嵌入 dist/worker.mjs）")
+	}
+	return assets.WorkerBundle, nil
+}
+
+func bundleDesc(c *Cfg) string {
+	if c.Bundle != "" {
+		return c.Bundle
+	}
+	return "内嵌 dist/worker.mjs"
 }
 
 func buildBindings(c *Cfg, dbID string) []map[string]any {
@@ -287,8 +302,8 @@ func runDeploy(c *Cfg) error {
 func printPlan(c *Cfg) {
 	fmt.Println("(--dry-run) 演练计划, 不会触碰 Cloudflare:")
 	fmt.Println("  1) D1 数据库    " + c.DbName + " (缺省自动创建)")
-	fmt.Println("  2) D1 迁移      migrations/*.sql (schema-aware 幂等)")
-	fmt.Println("  3) 上传 Worker  " + c.Bundle + " -> " + c.Worker)
+	fmt.Println("  2) D1 迁移      内嵌 migrations/*.sql (schema-aware 幂等)")
+	fmt.Println("  3) 上传 Worker  " + bundleDesc(c) + " -> " + c.Worker)
 	fmt.Println("  4) Secrets      SECRET / ADMIN_USERNAME / ADMIN_PASSWORD")
 	fmt.Println("  5) 自检         https://" + c.Worker + ".<subdomain>.workers.dev/robots.txt")
 }

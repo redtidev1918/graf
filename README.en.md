@@ -124,7 +124,7 @@ a /books index and per-book catalogs at /book/{slug}, and chapter pages show pre
 
 ## grafctl — Go deployer (no Node needed)
 
-**Zero-dependency one-click** (single binary; run `auth` once to store the token, then no env vars needed):
+**Zero-dependency one-click** (single binary with embedded migrations + worker bundle — no repo checkout/Node/npm; run `auth` once to store the token, then no env vars needed):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh

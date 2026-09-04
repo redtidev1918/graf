@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const version = "0.3.0"
+const version = "0.4.0"
 
 func main() {
 	args := os.Args[1:]
@@ -64,7 +64,7 @@ func printHelp() {
 	fmt.Println("  GRAF_DB_NAME / GRAF_DB_ID  D1 名称/id")
 	fmt.Println("  ADMIN_USERNAME / ADMIN_PASSWORD / SECRET   后台凭据与密钥(--yes 自动生成)")
 	fmt.Println("  SITE_NAME / SITE_ID / ENABLE_COMMENTS / BOOKS_ENABLED / CACHE_TTL / MAX_PAGE_LENGTH")
-	fmt.Println("  GRAF_BUNDLE            bundle 路径 (默认 ./dist/worker.mjs)")
+	fmt.Println("  GRAF_BUNDLE            bundle 路径 (默认内嵌 dist/worker.mjs)")
 	fmt.Println("  GRAF_LOG               日志文件")
 }
 
@@ -128,7 +128,7 @@ func loadCfg(args []string) *Cfg {
 	c.Worker = envOr("GRAF_WORKER", "graf")
 	c.DbName = envOr("GRAF_DB_NAME", "graf")
 	c.DbID = os.Getenv("GRAF_DB_ID")
-	c.Bundle = firstNonEmpty(c.Bundle, envOr("GRAF_BUNDLE", "./dist/worker.mjs"))
+	c.Bundle = firstNonEmpty(c.Bundle, os.Getenv("GRAF_BUNDLE")) // 空 = 内嵌 dist/worker.mjs
 	c.AdminUser = firstNonEmpty(c.AdminUser, os.Getenv("ADMIN_USERNAME"))
 	c.AdminPass = firstNonEmpty(c.AdminPass, os.Getenv("ADMIN_PASSWORD"))
 	c.Secret = firstNonEmpty(c.Secret, os.Getenv("SECRET"))
