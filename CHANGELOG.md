@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2026-09-04
+
+### Added
+
+- Static assets are embedded into the single-file worker bundle (deployable without the assets binding).
+- `grafctl` — cross-platform Go deployer (direct Cloudflare API, no Node): doctor / migrate / deploy with --yes/--dry-run; per-platform binaries released on `grafctl-v*` tags via goreleaser.
+- Docker one-command self-host (no Node on the host).
+
 ## [1.2.0] - 2026-09-03
 
 ### Added

@@ -11,7 +11,8 @@ graf-deploy.log
 .env
 
 # build & test artifacts
-dist/
+dist/*
+!dist/worker.mjs
 coverage/
 *.log
 

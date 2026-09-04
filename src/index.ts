@@ -1,5 +1,6 @@
 // Graf - Cloudflare Worker entrypoint.
 import type { Env } from "./config";
+import { STATIC_MAP } from "./static";
 import { loadConfig } from "./config";
 import { json } from "./util";
 import { routeTelegraphApi } from "./telegraph";
@@ -88,7 +89,16 @@ async function route(request: Request, env: Env): Promise<Response> {
     return new Response(null, { status: res.status, headers: res.headers });
   }
 
-  // static assets (workers static assets binding)
+  // static assets: bundled map first (single-file deploys), assets binding as fallback
+  {
+    const entry = STATIC_MAP[pathname];
+    if (entry) {
+      const body = entry.isBinary
+        ? Uint8Array.from(atob(entry.body), (c) => c.charCodeAt(0))
+        : entry.body;
+      return withSecurity(new Response(body, { headers: { "content-type": entry.type } }));
+    }
+  }
   for (const prefix of STATIC_PREFIXES) {
     if (pathname === prefix || pathname.startsWith(prefix)) {
       const asset = await env.ASSETS.fetch(request).catch(() => null);

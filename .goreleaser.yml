@@ -1,0 +1,33 @@
+version: 2
+project_name: grafctl
+before:
+  hooks:
+    - npm ci
+    - npm run build
+builds:
+  - id: grafctl
+    main: ./cmd/grafctl
+    binary: grafctl
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ldflags: -s -w
+archives:
+  - id: grafctl
+    formats: [tar.gz, zip]
+    name_template: "grafctl_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - dist/worker.mjs
+      - LICENSE
+      - README.md
+release:
+  github:
+    owner: redtidev1918
+    name: graf
+  extra_files:
+    - glob: dist/worker.mjs
+checksum:
+  name_template: "checksums.txt"
+changelog:
+  use: github
+

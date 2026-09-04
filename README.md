@@ -118,6 +118,18 @@ curl -X POST https://your-worker.example/createPage \
 BOOKS_ENABLED=true 时启用：在后台「作品」建书并把页面章节按顺序归入作品；读者访问 /books 与
 /book/{标识}/ 目录，章节页自动带「上一章 / 回目录 / 下一章」导航。
 
+## Go 版一键部署器 grafctl（无需 Node）
+
+从 [Releases](https://github.com/redtidev1918/graf/releases) 下载对应平台二进制（grafctl-v*，Linux/macOS/Windows × amd64/arm64）：
+
+```bash
+export CLOUDFLARE_API_TOKEN=你的Token
+grafctl doctor          # 检查账号/D1/迁移
+grafctl deploy --yes    # 全自动部署(建库/迁移/Secrets/上传/自检)
+```
+
+> 与 npm 版 deploy.mjs 功能对等；打 grafctl-v* tag 即触发分平台 Release。
+
 ## 评论
 
 ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落侧边评论与点赞；

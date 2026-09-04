@@ -48,7 +48,9 @@
     "typecheck": "tsc --noEmit",
     "deploy:auto": "node scripts/deploy.mjs",
     "deploy:auto:yes": "node scripts/deploy.mjs --yes",
-    "deploy:dry": "node scripts/deploy.mjs --dry-run"
+    "deploy:dry": "node scripts/deploy.mjs --dry-run",
+    "build": "node scripts/build-assets.mjs && esbuild src/index.ts --bundle --format=esm --platform=browser --outfile=dist/worker.mjs --target=es2022 --legal-comments=none",
+    "build:check": "esbuild src/index.ts --bundle --format=esm --platform=browser --outfile=/dev/null"
   },
   "type": "module",
   "version": "1.0.0"

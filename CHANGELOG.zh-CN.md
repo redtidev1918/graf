@@ -1,5 +1,13 @@
 # 变更记录（中文）
 
+## [1.3.0] - 2026-09-04
+
+### 新增
+
+- 静态资源内嵌为单文件 Worker bundle（无需 assets binding 也可部署）。
+- `grafctl`：Go 跨平台部署器（Cloudflare API 直连、无需 Node），doctor / migrate / deploy，支持 --yes/--dry-run；打 `grafctl-v*` tag 由 goreleaser 分平台发版。
+- Docker 一键自托管（宿主机无需 Node）。
+
 ## [1.2.0] - 2026-09-03
 
 ### 新增

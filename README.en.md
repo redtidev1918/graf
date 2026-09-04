@@ -122,6 +122,16 @@ Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 With BOOKS_ENABLED=true, create books in the admin area and group chapter pages into them; readers get
 a /books index and per-book catalogs at /book/{slug}, and chapter pages show previous/next navigation.
 
+## grafctl — Go deployer (no Node needed)
+
+Download the per-platform binary from [Releases](https://github.com/redtidev1918/graf/releases) (grafctl-v*):
+
+```bash
+export CLOUDFLARE_API_TOKEN=your-token
+grafctl doctor
+grafctl deploy --yes
+```
+
 ## Comments
 
 When ENABLE_COMMENTS is on, published pages load assets/js/paranote.js, which renders a
