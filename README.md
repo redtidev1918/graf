@@ -46,6 +46,16 @@ node scripts/deploy.mjs      # 或 npm run deploy:auto
 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' node scripts/deploy.mjs
 ```
 
+### Docker 一键自托管（本机/内网，无需安装 Node）
+
+```bash
+SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/docker-up.sh
+```
+
+或手动：`docker compose up -d --build` → 打开 http://localhost:8787。数据在 `graf-data` 卷（SQLite 持久化）。
+
+> 说明：容器内以本地模式运行 Worker（适合个人/内网使用）；对外大规模发布仍推荐 Cloudflare（见上）。
+
 ### 手动分步（可选）
 
 前置：Node.js >= 18、Cloudflare 账号（免费 Workers 套餐即可）。

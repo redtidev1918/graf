@@ -36,6 +36,16 @@ Windows is supported too — the tool is pure Node; see [docs/DEPLOYMENT.md](doc
 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' node scripts/deploy.mjs
 ```
 
+### Docker one-command self-host (local/LAN, no Node needed)
+
+```bash
+SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/docker-up.sh
+```
+
+Or manually: `docker compose up -d --build` → open http://localhost:8787. Data persists in the
+`graf-data` volume (SQLite). Note: the container runs the Worker in local mode — good for personal/LAN
+use; for public traffic we recommend Cloudflare (above).
+
 ### Manual step-by-step (optional)
 
 Prerequisites: Node.js >= 18 and a Cloudflare account with the free Workers plan.

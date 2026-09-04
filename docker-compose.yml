@@ -1,0 +1,21 @@
+# Graf 一键自托管（本机/内网，无需 Node）
+#   docker compose up -d --build
+#   打开 http://localhost:8787
+services:
+  graf:
+    build: .
+    container_name: graf
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      SECRET: ${SECRET:-please-change-me-to-a-long-random-string}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-now}
+      SITE_NAME: ${SITE_NAME:-Graf}
+      ENABLE_COMMENTS: ${ENABLE_COMMENTS:-true}
+      BOOKS_ENABLED: ${BOOKS_ENABLED:-true}
+    volumes:
+      - graf-data:/app/.wrangler
+volumes:
+  graf-data:

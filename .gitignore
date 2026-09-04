@@ -8,6 +8,8 @@ node_modules/
 
 graf-deploy.log
 
+.env
+
 # build & test artifacts
 dist/
 coverage/

@@ -6,6 +6,15 @@
 - Cloudflare account (Workers free plan is fine; D1 free tier included).
 - For a custom domain: a zone on Cloudflare (see section 6).
 
+## 1b. Docker one-command self-host (no Node on the host)
+
+```bash
+SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' ./scripts/docker-up.sh
+```
+
+The image bundles Node + wrangler and runs Graf in local mode (SQLite data in the `graf-data` volume).
+Suitable for personal/LAN use; Cloudflare is recommended for public traffic.
+
 ## 2. Fastest path: one-command auto deploy (recommended)
 
 On a machine that does not have the repository yet, paste this single line (it clones the repo,

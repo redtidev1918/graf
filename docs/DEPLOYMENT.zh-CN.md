@@ -6,6 +6,15 @@
 - Cloudflare 账号（Workers 免费套餐即可，D1 免费额度包含在内）。
 - 自定义域名：需一个托管在 Cloudflare 的 zone（见第 7 节）。
 
+## 1b. Docker 一键自托管（宿主机无需 Node）
+
+```bash
+SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./scripts/docker-up.sh
+```
+
+镜像内置 Node + wrangler，以本地模式运行 Graf（SQLite 数据存于 graf-data 卷），适合个人/内网；
+对外发布仍推荐 Cloudflare。
+
 ## 2. 最快路径：一键全自动部署（推荐）
 
 没有克隆过仓库的机器，复制这一行回车即可（自动 clone → 装依赖 → 登录检查 → 建库 →
