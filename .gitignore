@@ -10,6 +10,8 @@ graf-deploy.log
 
 .env
 
+.goreleaser-dist/
+
 # build & test artifacts
 dist/*
 !dist/worker.mjs
