@@ -14,7 +14,7 @@ case "$arch" in
   *) echo "暂不支持的架构: $arch"; exit 1 ;;
 esac
 repo="redtidev1918/graf"
-tag="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" | sed -n 's/.*"tag_name": "\([^"]*\)".*/\1/p' | head -1)"
+tag="$(curl -fsSL "https://api.github.com/repos/$repo/releases?per_page=100" | grep -o '"tag_name": "v[^"]*-grafctl"' | head -1 | sed 's/.*"tag_name": "\(.*\)"/\1/')"
 [ -n "$tag" ] || { echo "无法获取最新版本"; exit 1; }
 ver="${tag#v}"
 name="grafctl_${ver}_${os}_${arch}.tar.gz"
@@ -28,10 +28,19 @@ mkdir -p "$bin"
 install -m 0755 "$tmp/grafctl" "$bin/grafctl"
 rm -rf "$tmp"
 echo "==> grafctl 已安装到 $bin/grafctl"
-case ":$PATH:" in
-  *":$bin:"*) ;;
-  *) echo "提示: 把 $bin 加入 PATH:  export PATH=\"$HOME/.local/bin:$PATH\"" ;;
+rc=""
+case "$(basename "${SHELL:-}")" in
+  zsh) rc="$HOME/.zshrc" ;;
+  bash) rc="$HOME/.bashrc" ;;
 esac
+if [ -n "$rc" ] && ! grep -qF '.local/bin' "$rc" 2>/dev/null; then
+  {
+    echo ""
+    echo "# grafctl"
+    echo 'export PATH="$HOME/.local/bin:$PATH"'
+  } >> "$rc"
+  echo "==> 已将 $bin 加入 PATH（写入 $rc）；重开终端或执行: source $rc"
+fi
 echo ""
 echo "下一步(只需一次):"
 echo "  grafctl auth          # 粘贴 Cloudflare API Token"

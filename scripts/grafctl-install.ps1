@@ -2,8 +2,9 @@
 $ErrorActionPreference = "Stop"
 $repo = "redtidev1918/graf"
 $arch = if ($env:PROCESSOR_ARCHITECTURE -match "ARM64|ARM") { "arm64" } else { "amd64" }
-$latest = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest"
-$tag = $latest.tag_name
+$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases?per_page=100"
+$tag = ($releases | Where-Object { $_.tag_name -like "v*-grafctl" } | Select-Object -First 1).tag_name
+if (-not $tag) { throw "无法获取最新 grafctl 版本" }
 $ver = if ($tag.StartsWith("v")) { $tag.Substring(1) } else { $tag }
 $name = "grafctl_${ver}_windows_${arch}.zip"
 $url = "https://github.com/$repo/releases/download/${tag}/${name}"
@@ -18,7 +19,12 @@ Copy-Item -Force (Join-Path $tmp "grafctl.exe") (Join-Path $bin "grafctl.exe")
 Remove-Item -Recurse -Force $tmp
 Write-Host ("==> 已安装到 " + $bin + "\grafctl.exe")
 if ($env:PATH -notlike ("*" + $bin + "*")) {
-  Write-Host ("提示: 把 " + $bin + " 加入 PATH（可选），例如:  setx PATH " + $env:PATH + ";" + $bin)
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  if ($userPath -notlike ("*" + $bin + "*")) {
+    [Environment]::SetEnvironmentVariable("Path", ($userPath.TrimEnd(';') + ";" + $bin), "User")
+  }
+  $env:PATH = "$env:PATH;$bin"
+  Write-Host ("==> 已将 " + $bin + " 加入用户 PATH（新开终端生效）")
 }
 Write-Host ""
 Write-Host "下一步(只需一次):"
