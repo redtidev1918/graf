@@ -9,6 +9,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"os"
 	"path/filepath"
 	"time"
@@ -97,7 +98,7 @@ func readBundle(c *Cfg) ([]byte, error) {
 }
 
 func buildBindings(c *Cfg, dbID string) []map[string]any {
-	b := []map[string]any{{"type": "d1_databases", "name": "DB", "id": dbID}}
+	b := []map[string]any{{"type": "d1", "name": "DB", "id": dbID, "database_id": dbID}}
 	vars := map[string]string{
 		"SITE_NAME":       c.SiteName,
 		"SITE_ID":         c.SiteID,
@@ -107,7 +108,7 @@ func buildBindings(c *Cfg, dbID string) []map[string]any {
 		"MAX_PAGE_LENGTH": c.MaxPage,
 	}
 	for k, v := range vars {
-		b = append(b, map[string]any{"type": "vars", "name": k, "value": v})
+		b = append(b, map[string]any{"type": "plain_text", "name": k, "text": v})
 	}
 	return b
 }
@@ -115,6 +116,7 @@ func buildBindings(c *Cfg, dbID string) []map[string]any {
 func uploadWorker(cli *apiClient, c *Cfg, dbID string, bundle []byte) error {
 	meta := map[string]any{
 		"name":                c.Worker,
+		"workers_dev":         true,
 		"main_module":         "worker.mjs",
 		"compatibility_date":  "2025-06-01",
 		"compatibility_flags": []string{"nodejs_compat"},
@@ -131,7 +133,10 @@ func uploadWorker(cli *apiClient, c *Cfg, dbID string, bundle []byte) error {
 	if _, err := metaPart.Write(metaJSON); err != nil {
 		return err
 	}
-	filePart, err := mw.CreateFormFile("worker.mjs", "worker.mjs")
+	moduleHdr := make(textproto.MIMEHeader)
+	moduleHdr.Set("Content-Disposition", "form-data; name=\"worker.mjs\"; filename=\"worker.mjs\"")
+	moduleHdr.Set("Content-Type", "application/javascript+module")
+	filePart, err := mw.CreatePart(moduleHdr)
 	if err != nil {
 		return err
 	}
