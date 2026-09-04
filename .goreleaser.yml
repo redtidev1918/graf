@@ -1,9 +1,5 @@
 version: 2
 project_name: grafctl
-before:
-  hooks:
-    - npm ci
-    - npm run build
 builds:
   - id: grafctl
     main: ./cmd/grafctl
