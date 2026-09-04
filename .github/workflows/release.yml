@@ -2,7 +2,7 @@ name: Release grafctl (per-platform)
 
 on:
   push:
-    tags: ['grafctl-v*']
+    tags: ['v*-grafctl']
 
 permissions:
   contents: write
