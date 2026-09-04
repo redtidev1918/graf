@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- grafctl 0.4.0：D1 迁移 + Worker bundle 内嵌进二进制（真正单文件，无需克隆仓库/Node/npm）；默认用内嵌 bundle，`GRAF_BUNDLE` 可覆盖。
+- grafctl 0.4.1：D1 迁移 + Worker bundle 内嵌进二进制（真正单文件，无需克隆仓库/Node/npm）；`--help`/`--version` 不再误触发部署；默认用内嵌 bundle，`GRAF_BUNDLE` 可覆盖。
 - grafctl 0.3.0：Token 持久化(`auth`)、自动开启 worker.dev、彩色分级日志 + `--no-color`、一键安装脚本(sh 与 PowerShell `irm | iex`)、分平台发布二进制。
 
 ## [1.3.0] - 2026-09-04
@@ -10,7 +10,7 @@
 ### 新增
 
 - 静态资源内嵌为单文件 Worker bundle（无需 assets binding 也可部署）。
-- `grafctl`：Go 跨平台部署器（Cloudflare API 直连、无需 Node），doctor / migrate / deploy，支持 --yes/--dry-run；打 `grafctl-v*` tag 由 goreleaser 分平台发版。
+- `grafctl`：Go 跨平台部署器（Cloudflare API 直连、无需 Node），doctor / migrate / deploy，支持 --yes/--dry-run；打 `v*-grafctl` tag 由 goreleaser 分平台发版。
 - Docker 一键自托管（宿主机无需 Node）。
 
 ## [1.2.0] - 2026-09-03

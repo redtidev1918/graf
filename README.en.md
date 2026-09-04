@@ -132,6 +132,10 @@ grafctl auth
 grafctl deploy --yes
 ```
 
+Common commands: `grafctl doctor` (read-only check), `grafctl migrate` (migrations only), `grafctl deploy --dry-run` (plan), `grafctl --version`.
+
+> With `--yes` and no `ADMIN_USERNAME`/`ADMIN_PASSWORD` set, a random admin password is auto-generated (shown once); to keep an existing password, run `export ADMIN_USERNAME=admin ADMIN_PASSWORD=yourpass` first.
+
 Or download Linux/macOS/Windows × amd64/arm64 binaries manually from [Releases](https://github.com/redtidev1918/graf/releases).
 
 ## Comments

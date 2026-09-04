@@ -128,9 +128,13 @@ grafctl auth            # 粘贴一次 Cloudflare API Token(保存到用户配�
 grafctl deploy --yes    # 之后一条命令全自动部署
 ```
 
+常用命令：`grafctl doctor`（只读自检）、`grafctl migrate`（只跑迁移）、`grafctl deploy --dry-run`（演练）、`grafctl --version`。
+
+> `--yes` 在未设 `ADMIN_USERNAME`/`ADMIN_PASSWORD` 时会**自动生成随机管理员密码**（仅显示一次）；想保留原密码请先 `export ADMIN_USERNAME=admin ADMIN_PASSWORD=你的密码` 再部署。
+
 也可从 [Releases](https://github.com/redtidev1918/graf/releases) 手动下载 Linux/macOS/Windows × amd64/arm64 二进制。
 
-> 与 npm 版 deploy.mjs 功能对等；打 grafctl-v* tag 即触发分平台 Release。
+> 与 npm 版 deploy.mjs 功能对等；打 `v*-grafctl` tag 即触发分平台 Release。
 
 ## 评论
 

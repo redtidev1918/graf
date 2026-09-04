@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- grafctl 0.4.0: D1 migrations + Worker bundle embedded into the binary (truly single-file; no repo checkout/Node/npm needed); embedded bundle is the default, `GRAF_BUNDLE` overrides.
+- grafctl 0.4.1: D1 migrations + Worker bundle embedded into the binary (truly single-file; no repo checkout/Node/npm needed); `--help`/`--version` no longer trigger a deploy; embedded bundle is the default, `GRAF_BUNDLE` overrides.
 - grafctl 0.3.0: token persistence (`auth`), auto-enable worker.dev, color-coded logging + `--no-color`, one-line installers (sh + PowerShell `irm | iex`), per-platform release binaries.
 
 ## [1.3.0] - 2026-09-04
@@ -10,7 +10,7 @@
 ### Added
 
 - Static assets are embedded into the single-file worker bundle (deployable without the assets binding).
-- `grafctl` — cross-platform Go deployer (direct Cloudflare API, no Node): doctor / migrate / deploy with --yes/--dry-run; per-platform binaries released on `grafctl-v*` tags via goreleaser.
+- `grafctl` — cross-platform Go deployer (direct Cloudflare API, no Node): doctor / migrate / deploy with --yes/--dry-run; per-platform binaries released on `v*-grafctl` tags via goreleaser.
 - Docker one-command self-host (no Node on the host).
 
 ## [1.2.0] - 2026-09-03

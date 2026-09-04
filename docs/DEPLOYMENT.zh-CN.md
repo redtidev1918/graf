@@ -17,6 +17,8 @@ SECRET=openssl-rand-hex-32 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' ./
 
 ## 1c. 零依赖最快路径：grafctl（单二进制）
 
+单文件二进制，内嵌 D1 迁移与 Worker bundle，**无需克隆仓库/Node/npm**；安装脚本自动写 PATH：
+
 ```bash
 # macOS/Linux
 curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
@@ -27,7 +29,9 @@ grafctl auth          # 首次粘贴一次 Cloudflare API Token(存到用户配�
 grafctl deploy --yes  # 之后零依赖一键部署(建库→迁移→Secrets→上传→开启worker.dev→自检)
 ```
 
-彩色分级输出；`doctor` 自检；`--dry-run`/`--yes`/`--no-color`。
+彩色分级输出；`doctor` 只读自检、`migrate` 只跑迁移、`deploy --dry-run` 演练、`--no-color`/`--version`。
+
+> `--yes` 在未设 `ADMIN_USERNAME`/`ADMIN_PASSWORD` 时自动生成随机管理员密码（仅显示一次）；保留原密码请先 `export ADMIN_USERNAME=admin ADMIN_PASSWORD=你的密码` 再部署。
 
 ## 2. 最快路径：一键全自动部署（推荐）
 

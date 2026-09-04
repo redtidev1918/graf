@@ -17,6 +17,8 @@ Suitable for personal/LAN use; Cloudflare is recommended for public traffic.
 
 ## 1c. Zero-dependency path: grafctl (single binary)
 
+A single binary with embedded D1 migrations + Worker bundle — **no repo checkout / Node / npm**; the installer adds it to PATH:
+
 ```bash
 # macOS/Linux
 curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/grafctl-install.sh | sh
@@ -27,7 +29,9 @@ grafctl auth          # paste a Cloudflare API Token once
  grafctl deploy --yes # zero-dependency deploy afterwards (db -> migrations -> secrets -> upload -> worker.dev -> check)
 ```
 
-Color-coded output, `doctor` health check, `--dry-run`/`--yes`/`--no-color`.
+Color-coded output, `doctor` (read-only check), `migrate` (migrations only), `deploy --dry-run` (plan), `--no-color`/`--version`.
+
+> With `--yes` and no `ADMIN_USERNAME`/`ADMIN_PASSWORD` set, a random admin password is auto-generated (shown once); to keep an existing password, run `export ADMIN_USERNAME=admin ADMIN_PASSWORD=yourpass` first.
 
 ## 2. Fastest path: one-command auto deploy (recommended)
 
