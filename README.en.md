@@ -5,6 +5,8 @@ Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API
 [Telegra.ph](https://telegra.ph) (the Telegraph API), designed to run entirely on
 **Cloudflare Workers + D1**. One short URL, instant pages, optional paragraph-level comments.
 
+> Live demo: [graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
+
 Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
 
 ## Features
