@@ -57,7 +57,7 @@ Cloudflare's edge with zero servers to operate:
 
 Backups are JSON. The old Django export (list of pages: hashcode/content/title/author/… ) can be
 converted with `scripts/convert-django-backup.mjs` and imported through the new /admin — see
-[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) section 8.
+[DEPLOYMENT.md](DEPLOYMENT.md) section 8.
 
 ## 5. Naming
 
