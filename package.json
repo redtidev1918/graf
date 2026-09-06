@@ -3,7 +3,7 @@
     "url": "https://github.com/redtidev1918/graf/issues"
   },
   "dependencies": {
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^15.0.1",
     "markdown-it-footnote": "^4.0.0"
   },
   "description": "Graf — 极简、自托管的 Markdown 发布平台，兼容 Telegra.ph（Telegraph API），运行于 Cloudflare Workers + D1。",
