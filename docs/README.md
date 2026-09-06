@@ -7,17 +7,9 @@ Graf 是一个极简、**自托管的 Markdown 发布平台**，**兼容 Telegra
 >
 > GitHub 仓库：[redtidev1918/graf](https://github.com/redtidev1918/graf)
 
-## 📥 下载 grafctl
+## 📥 下载
 
-`grafctl` 是发布 / 管理 CLI（单二进制，含签名校验 `checksums.txt`）：
-
-| 平台 | 文件 |
-|---|---|
-| macOS | `grafctl_<version>_darwin_amd64|arm64.tar.gz` / `.zip` |
-| Linux | `grafctl_<version>_linux_amd64|arm64.tar.gz` / `.zip` |
-| Windows | `grafctl_<version>_windows_amd64|arm64.tar.gz` / `.zip` |
-
-👉 最新版见 [GitHub Releases](https://github.com/redtidev1918/graf/releases/latest)。
+`grafctl` 发布 / 管理 CLI 见 [📥 下载页](download.md)（自动指向最新 Release）。
 
 ## 按任务找文档
 

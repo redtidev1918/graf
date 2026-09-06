@@ -1,4 +1,5 @@
 - [文档中心](/)
+- [📥 下载](download.md)
 
 - 使用与开发
   - [API 参考](API.zh-CN.md)
