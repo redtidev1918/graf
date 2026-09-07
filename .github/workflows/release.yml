@@ -104,11 +104,12 @@ jobs:
           fi
           echo "grafctl tag: $TAG"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
-          if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/$TAG" >/dev/null 2>&1; then
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git ls-remote --exit-code --tags origin "$TAG" >/dev/null 2>&1; then
             echo "tag $TAG missing — creating at HEAD ($(git rev-parse --short HEAD))"
-            SHA="$(git rev-parse HEAD)"
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/git/ref" \
-              -f ref="refs/tags/$TAG" -f sha="$SHA"
+            git tag -a "$TAG" -m "$TAG"
+            git push origin "$TAG"
           fi
           git fetch --tags --force
           git checkout "$TAG"
