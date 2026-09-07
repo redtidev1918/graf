@@ -12,7 +12,8 @@
       "package-name": "grafctl",
       "component": "grafctl",
       "include-v-in-tag": true,
-      "include-component-in-tag": true
+      "include-component-in-tag": true,
+      "tag-separator": "-"
     }
   }
 }
