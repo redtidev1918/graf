@@ -80,6 +80,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: master
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -88,6 +89,29 @@ jobs:
         with:
           go-version: '1.23'
           cache: true
+      - name: Ensure grafctl component tag exists and check it out
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # release-please 合并 monorepo 时只推了 worker 的 vX tag，grafctl 的 component
+          # tag（grafctl-vX.Y.Z）需要这里显式创建，goreleaser 才能取到正确版本号。
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            V="$(sed -n 's/.*"cmd\/grafctl": "\([^"]*\)".*/\1/p' .release-please-manifest.json)"
+            TAG="grafctl-v$V"
+          fi
+          echo "grafctl tag: $TAG"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "tag $TAG missing — creating at HEAD ($(git rev-parse --short HEAD))"
+            SHA="$(git rev-parse HEAD)"
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/git/ref" \
+              -f ref="refs/tags/$TAG" -f sha="$SHA"
+          fi
+          git fetch --tags --force
+          git checkout "$TAG"
       - name: Release
         uses: goreleaser/goreleaser-action@v7
         with:
@@ -95,4 +119,5 @@ jobs:
           version: latest
           args: release --clean
         env:
+          GORELEASER_CURRENT_TAG: ${{ env.TAG }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
