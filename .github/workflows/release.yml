@@ -3,7 +3,7 @@ name: Release
 # 全自动发版，无需 PAT/secret：master 上合入 release-worthy 提交后 release-please 在本
 # 工作流内开/更发版 PR。本仓库有两个独立组件，各自 tag：
 #   - Worker（Cloudflare）：tag vX.Y.Z           → 发版同 run 内 wrangler deploy + D1 迁移
-#   - grafctl（Go CLI）：  tag grafctl-vX.Y.Z → 发版同 run 内 goreleaser 构建/发 Release
+#   - grafctl（Go CLI）：  tag vX.Y.Z-grafctl → 发版同 run 内 goreleaser 构建/发 Release
 # 内置 GITHUB_TOKEN 即可（同 run 内 job 不受「推 tag 不触发新工作流」限制）。
 # 仍支持手动推对应 tag 重跑。
 on:
@@ -95,12 +95,12 @@ jobs:
         run: |
           set -euo pipefail
           # release-please 合并 monorepo 时只推了 worker 的 vX tag，grafctl 的 component
-          # tag（grafctl-vX.Y.Z）需要这里显式创建，goreleaser 才能取到正确版本号。
+          # tag（vX.Y.Z-grafctl）需要这里显式创建，goreleaser 才能取到正确版本号。
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             TAG="${{ inputs.tag }}"
           else
             V="$(sed -n 's/.*"cmd\/grafctl": "\([^"]*\)".*/\1/p' .release-please-manifest.json)"
-            TAG="grafctl-v$V"
+            TAG="v$V-grafctl"
           fi
           echo "grafctl tag: $TAG"
           echo "TAG=$TAG" >> "$GITHUB_ENV"

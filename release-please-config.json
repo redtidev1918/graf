@@ -10,10 +10,9 @@
     "cmd/grafctl": {
       "release-type": "simple",
       "package-name": "grafctl",
-      "component": "grafctl",
       "include-v-in-tag": true,
-      "include-component-in-tag": true,
-      "tag-separator": "-"
+      "include-component-in-tag": false,
+      "tag-separator": "-grafctl"
     }
   }
 }
