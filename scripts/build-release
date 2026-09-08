@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rm -rf dist/release .goreleaser-dist && mkdir -p dist/release
+npm ci
+npm test
+npm run typecheck
+npm run build
+go test ./...
+cp dist/worker.mjs dist/release/worker.mjs
+GORELEASER_CURRENT_TAG="v$RELEASE_VERSION" goreleaser release --clean --snapshot --dist .goreleaser-dist
+cp .goreleaser-dist/grafctl_* dist/release/
+cp .goreleaser-dist/checksums.txt dist/release/checksums.txt
