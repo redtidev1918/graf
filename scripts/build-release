@@ -16,7 +16,7 @@ make_archive() {
   mkdir -p "$work"
   [ "$goos" = windows ] && bin=grafctl.exe
   CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build \
-    -trimpath -ldflags "-s -w -X main.version=v$RELEASE_VERSION" \
+    -trimpath -ldflags "-s -w -X main.version=$RELEASE_VERSION" \
     -o "$work/$bin" ./cmd/grafctl
   cp LICENSE README.md "$work/"
   if [ "$ext" = zip ]; then
