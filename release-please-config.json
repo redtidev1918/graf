@@ -5,8 +5,7 @@
       "release-type": "simple",
       "package-name": "graf",
       "include-v-in-tag": true,
-      "include-component-in-tag": false,
-      "draft": true
+      "include-component-in-tag": false
     }
   }
 }

@@ -1,8 +1,8 @@
 name: Release
 
-# One product, one version, one Release. Merging the Release Please PR creates a
-# draft vX.Y.Z release; this workflow deploys Graf, attaches every grafctl build,
-# verifies the assets, then removes older Release entries while keeping git tags.
+# One product, one version, one Release. Merging the Release Please PR tags and
+# publishes a vX.Y.Z release; this workflow deploys Graf, attaches every grafctl
+# build, verifies the assets, then removes older Release entries (git tags stay).
 on:
   push:
     branches: [master]
@@ -130,8 +130,7 @@ jobs:
             grep -Fxq "$name" <<< "$assets" || { echo "missing asset: $name" >&2; exit 1; }
           done
 
-          # All assets verified: publish the draft release-please created and pin it
-          # as Latest before removing anything, so a Latest release always exists.
+          # All assets verified: pin the release as Latest (idempotent).
           gh release edit "$TAG" --draft=false --latest
 
           mapfile -t old_release_ids < <(

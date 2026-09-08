@@ -24,10 +24,11 @@ release:
   github:
     owner: redtidev1918
     name: graf
-  use_existing_draft: true
-  replace_existing_artifacts: true
-  make_latest: true
+  # release-please creates the published, tagged vX.Y.Z release on merge; goreleaser
+  # just attaches every build to that existing release.
   mode: keep-existing
+  make_latest: true
+  replace_existing_artifacts: true
   preflight:
     fail_on_error: true
   extra_files:
