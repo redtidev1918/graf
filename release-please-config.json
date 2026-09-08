@@ -5,14 +5,8 @@
       "release-type": "simple",
       "package-name": "graf",
       "include-v-in-tag": true,
-      "include-component-in-tag": false
-    },
-    "cmd/grafctl": {
-      "release-type": "simple",
-      "package-name": "grafctl",
-      "include-v-in-tag": true,
       "include-component-in-tag": false,
-      "tag-separator": "-grafctl"
+      "draft": true
     }
   }
 }

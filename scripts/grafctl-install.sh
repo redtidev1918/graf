@@ -14,11 +14,8 @@ case "$arch" in
   *) echo "暂不支持的架构: $arch"; exit 1 ;;
 esac
 repo="redtidev1918/graf"
-tag="$(curl -fsSL "https://api.github.com/repos/$repo/releases?per_page=100" | grep -o '"tag_name": "v[^"]*-grafctl"' | head -1 | sed 's/.*"tag_name": "\(.*\)"/\1/')"
-[ -n "$tag" ] || { echo "无法获取最新版本"; exit 1; }
-ver="${tag#v}"
-name="grafctl_${ver}_${os}_${arch}.tar.gz"
-url="https://github.com/$repo/releases/download/${tag}/${name}"
+name="grafctl_${os}_${arch}.tar.gz"
+url="https://github.com/$repo/releases/latest/download/${name}"
 tmp="$(mktemp -d)"
 echo "==> 下载 ${name} ..."
 curl -fsSL "$url" -o "$tmp/grafctl.tar.gz"

@@ -127,7 +127,7 @@ Your service is now at https://graf.<subdomain>.workers.dev (or whatever the nam
 
 ### 6.1. Deploying from GitHub Actions (optional)
 
-A tag starting with `v` (e.g. `v1.0.0`) triggers `.github/workflows/deploy.yml`, which applies
+A `vX.Y.Z` tag (e.g. `v1.2.0`) triggers the Release workflow, which tests the project, applies
 the D1 migrations and deploys the worker automatically. Add repository secrets:
 `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit + D1:Edit) and `CLOUDFLARE_ACCOUNT_ID`.
 `wrangler.toml` must contain the real `database_id` for this to work.
@@ -182,4 +182,3 @@ readers are in mainland China, plan for one of:
 - Markdown rendering happens per request (or per CACHE_TTL window) with markdown-it; very large
   pages (close to MAX_PAGE_LENGTH) are the only case where CPU limits could matter — raise
   CACHE_TTL if you see sustained hot reads.
-

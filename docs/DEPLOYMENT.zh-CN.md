@@ -135,7 +135,7 @@ npm run deploy     # npx wrangler deploy
 
 ### 6.1. 通过 GitHub Actions 自动部署（可选）
 
-推 `v` 开头 tag（如 v1.0.0）会触发 .github/workflows/deploy.yml：自动执行 D1 迁移并部署。
+推 `vX.Y.Z` tag（如 v1.2.0）会触发 Release 工作流：自动测试、执行 D1 迁移、部署并上传 grafctl。
 需要在仓库 Settings → Secrets and variables → Actions 添加：
 CLOUDFLARE_API_TOKEN（Workers Scripts:Edit + D1:Edit）与 CLOUDFLARE_ACCOUNT_ID。
 前提是 wrangler.toml 中已填写真实 database_id。

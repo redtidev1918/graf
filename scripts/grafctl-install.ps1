@@ -2,12 +2,8 @@
 $ErrorActionPreference = "Stop"
 $repo = "redtidev1918/graf"
 $arch = if ($env:PROCESSOR_ARCHITECTURE -match "ARM64|ARM") { "arm64" } else { "amd64" }
-$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases?per_page=100"
-$tag = ($releases | Where-Object { $_.tag_name -like "v*-grafctl" } | Select-Object -First 1).tag_name
-if (-not $tag) { throw "无法获取最新 grafctl 版本" }
-$ver = if ($tag.StartsWith("v")) { $tag.Substring(1) } else { $tag }
-$name = "grafctl_${ver}_windows_${arch}.zip"
-$url = "https://github.com/$repo/releases/download/${tag}/${name}"
+$name = "grafctl_windows_${arch}.zip"
+$url = "https://github.com/$repo/releases/latest/download/${name}"
 $tmp = Join-Path $env:TEMP ("grafctl-install-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $tmp | Out-Null
 Write-Host ("==> 下载 " + $name + " ...")

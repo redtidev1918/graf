@@ -8,23 +8,31 @@ builds:
     env: [CGO_ENABLED=0]
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
-    ldflags: -s -w
+    ldflags: -s -w -X main.version={{ .Version }}
 archives:
   - id: grafctl
-    formats: [tar.gz, zip]
-    name_template: "grafctl_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    ids: [grafctl]
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "grafctl_{{ .Os }}_{{ .Arch }}"
     files:
-      - dist/worker.mjs
       - LICENSE
       - README.md
 release:
   github:
     owner: redtidev1918
     name: graf
+  use_existing_draft: true
+  replace_existing_artifacts: true
+  make_latest: true
+  mode: keep-existing
+  preflight:
+    fail_on_error: true
   extra_files:
     - glob: dist/worker.mjs
 checksum:
   name_template: "checksums.txt"
 changelog:
   use: github
-

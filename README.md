@@ -136,7 +136,7 @@ grafctl deploy --yes    # 之后一条命令全自动部署
 
 也可从 [Releases](https://github.com/redtidev1918/graf/releases) 手动下载 Linux/macOS/Windows × amd64/arm64 二进制。
 
-> 与 npm 版 deploy.mjs 功能对等；打 `v*-grafctl` tag 即触发分平台 Release。
+> 与 npm 版 deploy.mjs 功能对等；每个 `vX.Y.Z` Release 都附带分平台二进制。
 
 ## 评论
 
