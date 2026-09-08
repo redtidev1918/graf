@@ -15,6 +15,6 @@ else
   curl -fsSL "https://github.com/goreleaser/goreleaser/releases/download/v2.18.1/goreleaser_Linux_x86_64.tar.gz" | tar -xz -C "$tool_dir" goreleaser
   goreleaser_bin="$tool_dir/goreleaser"
 fi
-GORELEASER_CURRENT_TAG="v$RELEASE_VERSION" "$goreleaser_bin" release --clean --snapshot --dist .goreleaser-dist
+GORELEASER_CURRENT_TAG="v$RELEASE_VERSION" "$goreleaser_bin" release --clean --snapshot
 cp .goreleaser-dist/grafctl_* dist/release/
 cp .goreleaser-dist/checksums.txt dist/release/checksums.txt
