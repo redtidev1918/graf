@@ -1,0 +1,39 @@
+{
+  "kind": "hybrid",
+  "versioning": {
+    "mode": "release-please"
+  },
+  "build": {
+    "test": "npm ci && npm test && npm run typecheck && npm run build && go test ./...",
+    "command": "scripts/build-release",
+    "version_check": "tmp=$(mktemp -d) && tar -xzf dist/release/grafctl_linux_amd64.tar.gz -C \"$tmp\" grafctl && \"$tmp/grafctl\" --version | grep -Fx \"grafctl v$RELEASE_VERSION\""
+  },
+  "assets": {
+    "required": [
+      "grafctl_darwin_amd64.tar.gz",
+      "grafctl_darwin_arm64.tar.gz",
+      "grafctl_linux_amd64.tar.gz",
+      "grafctl_linux_arm64.tar.gz",
+      "grafctl_windows_amd64.zip",
+      "grafctl_windows_arm64.zip",
+      "checksums.txt",
+      "worker.mjs"
+    ],
+    "optional": []
+  },
+  "registries": {
+    "github": {
+      "required": true
+    }
+  },
+  "release": {
+    "post_publish": "node scripts/deploy.mjs || true"
+  },
+  "retention": {
+    "stable": 1,
+    "prerelease": 1,
+    "failed_draft": 2
+  },
+  "checksums": true,
+  "sbom": false
+}

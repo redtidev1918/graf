@@ -1,166 +1,32 @@
 name: Release
 
-# One product, one version, one Release. Merging the Release Please PR tags and
-# publishes a vX.Y.Z release; this workflow deploys Graf, attaches every grafctl
-# build, verifies the assets, then removes older Release entries (git tags stay).
 on:
+  pull_request:
   push:
     branches: [master]
-    tags:
-      - 'v*.*.*'
-      - '!v*-grafctl'
-      - '!grafctl-*'
+  schedule:
+    - cron: "29 * * * *"
   workflow_dispatch:
     inputs:
-      tag:
-        description: Existing release tag to rebuild (for example v1.2.0)
-        required: true
-        type: string
+      version: {description: "Existing version; blank reads the manifest", required: false, type: string}
+      dry_run: {description: "Build and validate without publishing", required: false, default: false, type: boolean}
+      force: {description: "Rerun a healthy version", required: false, default: false, type: boolean}
+      repair: {description: "Repair the current incomplete version", required: false, default: false, type: boolean}
+      stage: {description: "Recovery stage label", required: false, default: all, type: string}
 
 permissions:
   contents: write
   pull-requests: write
+  packages: write
+  id-token: write
 
 jobs:
-  release-please:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    outputs:
-      created: ${{ steps.release.outputs.release_created }}
-      tag: ${{ steps.release.outputs.tag_name }}
-    steps:
-      - uses: googleapis/release-please-action@v4
-        id: release
-        with:
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
-
-  publish:
-    name: Deploy and publish
-    needs: release-please
-    if: >-
-      always() && !cancelled() &&
-      (needs.release-please.outputs.created == 'true' ||
-       startsWith(github.ref, 'refs/tags/v') ||
-       github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.release-tag.outputs.tag }}
-    steps:
-      - name: Resolve release tag
-        id: release-tag
-        env:
-          RELEASE_PLEASE_TAG: ${{ needs.release-please.outputs.tag }}
-          DISPATCH_TAG: ${{ inputs.tag }}
-          REF_TAG: ${{ github.ref_name }}
-        run: |
-          if [ -n "$RELEASE_PLEASE_TAG" ]; then
-            tag="$RELEASE_PLEASE_TAG"
-          elif [ -n "$DISPATCH_TAG" ]; then
-            tag="$DISPATCH_TAG"
-          else
-            tag="$REF_TAG"
-          fi
-          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "invalid release tag: $tag" >&2
-            exit 1
-          fi
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          ref: ${{ steps.release-tag.outputs.tag }}
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-      - uses: actions/setup-go@v7
-        with:
-          go-version: '1.23'
-          cache: true
-
-      - name: Test and build
-        run: |
-          npm ci
-          npm test
-          npm run typecheck
-          npm run build
-          go test ./...
-
-      - name: Apply D1 migrations
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: d1 migrations apply graf --remote
-      - name: Deploy worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-
-      - name: Build and upload grafctl
-        uses: goreleaser/goreleaser-action@v7
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify assets and keep only this Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.release-tag.outputs.tag }}
-        run: |
-          version="${TAG#v}"
-          rm -f /tmp/grafctl
-          tar -xzf ".goreleaser-dist/grafctl_linux_amd64.tar.gz" -C /tmp grafctl
-          test "$(/tmp/grafctl --version)" = "grafctl v$version"
-
-          assets="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '.assets[].name')"
-          for name in \
-            checksums.txt worker.mjs \
-            grafctl_darwin_amd64.tar.gz grafctl_darwin_arm64.tar.gz \
-            grafctl_linux_amd64.tar.gz grafctl_linux_arm64.tar.gz \
-            grafctl_windows_amd64.zip grafctl_windows_arm64.zip
-          do
-            grep -Fxq "$name" <<< "$assets" || { echo "missing asset: $name" >&2; exit 1; }
-          done
-
-          # All assets verified: pin the release as Latest (idempotent).
-          gh release edit "$TAG" --draft=false --latest
-
-          mapfile -t old_release_ids < <(
-            gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate \
-              --jq ".[] | select(.tag_name != \"$TAG\") | .id"
-          )
-          for id in "${old_release_ids[@]}"; do
-            gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/$id"
-          done
-
-  update-download-page:
-    name: Update download page
-    needs: publish
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: master
-      - name: Generate download page
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python3 .github/scripts/update_download_page.py
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/download.md
-          if ! git diff --cached --quiet; then
-            git commit -m "docs: update downloads for ${{ needs.publish.outputs.tag }}"
-            git pull --rebase origin master
-            git push origin master
-          fi
+  release:
+    uses: redtidev1918/release-infra/.github/workflows/reusable-release.yml@v1
+    with:
+      version: ${{ inputs.version || '' }}
+      dry_run: ${{ github.event_name == 'pull_request' || inputs.dry_run || false }}
+      force: ${{ inputs.force || false }}
+      repair: ${{ github.event_name == 'pull_request' || inputs.repair || false }}
+      stage: ${{ inputs.stage || 'all' }}
+    secrets: inherit

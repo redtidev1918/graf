@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rm -rf dist/release build/release && mkdir -p dist/release build/release
+npm ci
+npm test
+npm run typecheck
+npm run build
+go test ./...
+cp dist/worker.mjs dist/release/worker.mjs
+
+make_archive() {
+  local goos=$1 goarch=$2 name=$3 ext=$4
+  local bin=grafctl work
+  work="build/release/$name"
+  mkdir -p "$work"
+  [ "$goos" = windows ] && bin=grafctl.exe
+  CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build \
+    -trimpath -ldflags "-s -w -X main.version=$RELEASE_VERSION" \
+    -o "$work/$bin" ./cmd/grafctl
+  cp LICENSE README.md "$work/"
+  if [ "$ext" = zip ]; then
+    (cd "$work" && zip -q -r "../../../dist/release/$name.zip" .)
+  else
+    tar -C "$work" -czf "dist/release/$name.tar.gz" "$bin" LICENSE README.md
+  fi
+}
+
+make_archive linux amd64 grafctl_linux_amd64 tar.gz
+make_archive linux arm64 grafctl_linux_arm64 tar.gz
+make_archive darwin amd64 grafctl_darwin_amd64 tar.gz
+make_archive darwin arm64 grafctl_darwin_arm64 tar.gz
+make_archive windows amd64 grafctl_windows_amd64 zip
+make_archive windows arm64 grafctl_windows_arm64 zip
+(cd dist/release && sha256sum grafctl_* worker.mjs > checksums.txt)
