@@ -6,6 +6,13 @@
 - grafctl 0.4.1: D1 migrations + Worker bundle embedded into the binary (truly single-file; no repo checkout/Node/npm needed); `--help`/`--version` no longer trigger a deploy; embedded bundle is the default, `GRAF_BUNDLE` overrides.
 - grafctl 0.3.0: token persistence (`auth`), auto-enable worker.dev, color-coded logging + `--no-color`, one-line installers (sh + PowerShell `irm | iex`), per-platform release binaries.
 
+## [1.2.1](https://github.com/redtidev1918/graf/compare/v1.2.0...v1.2.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **release:** write grafctl archive before tar changes directory ([#20](https://github.com/redtidev1918/graf/issues/20)) ([a9563c8](https://github.com/redtidev1918/graf/commit/a9563c8893ab8d5ed43cdb702ad650476efc31be))
+
 ## [1.2.0](https://github.com/redtidev1918/graf/compare/v1.1.1...v1.2.0) (2026-09-08)
 
 
