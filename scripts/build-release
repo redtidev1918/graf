@@ -22,7 +22,7 @@ make_archive() {
   if [ "$ext" = zip ]; then
     (cd "$work" && zip -q -r "../../../dist/release/$name.zip" .)
   else
-    tar -C "$work" -czf "dist/release/$name.tar.gz" "$bin" LICENSE README.md
+    tar -czf "$PWD/dist/release/$name.tar.gz" -C "$work" "$bin" LICENSE README.md
   fi
 }
 
