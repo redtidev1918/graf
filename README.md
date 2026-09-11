@@ -42,7 +42,7 @@ node scripts/deploy.mjs      # 或 npm run deploy:auto
 脚本会交互询问：站点名（默认 Graf）、是否启用评论、管理员用户名与密码（输入不回显、
 二次确认）。想跳过问答可先用环境变量提供（也可加 `--yes` 全自动，管理员密码自动生成并打印一次；
 `--dry-run` 可先演练）。Windows 同样支持（脚本为纯 Node，PowerShell 里把下载路径换成
-`$env:TEMP` 即可，详见 [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md)）。
+`$env:TEMP` 即可，详见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)）。
 
 ```bash
 ADMIN_USERNAME=admin ADMIN_PASSWORD='你的密码' node scripts/deploy.mjs
@@ -113,7 +113,7 @@ curl -X POST https://your-worker.example/createPage \
   --data-urlencode 'content=[{"tag":"p","children":["Hello world"]}]'
 ```
 
-完整中文参考：[docs/API.zh-CN.md](docs/API.zh-CN.md)
+完整中文参考：[docs/API.md](docs/API.md)
 
 ## 小说模式（可选）
 
@@ -148,16 +148,16 @@ ENABLE_COMMENTS=true 时页面自动加载 assets/js/paranote.js，提供段落�
 | 文档 | 英文 | 中文 |
 |---|---|---|
 | 项目说明 | [README.en.md](README.en.md) | [README.md](README.md) |
-| 项目历史 | [docs/HISTORY.md](docs/HISTORY.md) | [docs/HISTORY.zh-CN.md](docs/HISTORY.zh-CN.md) |
-| API 参考 | [docs/API.md](docs/API.md) | [docs/API.zh-CN.md](docs/API.zh-CN.md) |
-| 部署指南 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | [docs/DEPLOYMENT.zh-CN.md](docs/DEPLOYMENT.zh-CN.md) |
-| 架构说明 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | [docs/ARCHITECTURE.zh-CN.md](docs/ARCHITECTURE.zh-CN.md) |
+| 项目历史 | [docs/en/HISTORY.md](docs/en/HISTORY.md) | [docs/HISTORY.md](docs/HISTORY.md) |
+| API 参考 | [docs/en/API.md](docs/en/API.md) | [docs/API.md](docs/API.md) |
+| 部署指南 | [docs/en/DEPLOYMENT.md](docs/en/DEPLOYMENT.md) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| 架构说明 | [docs/en/ARCHITECTURE.md](docs/en/ARCHITECTURE.md) | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | 变更记录 | [CHANGELOG.md](CHANGELOG.md) | [CHANGELOG.zh-CN.md](CHANGELOG.zh-CN.md) |
 | 第三方声明 | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md) |
 
 ## 历史
 
-本项目由早期实现发展而来，完整血统与演变见 [docs/HISTORY.zh-CN.md](docs/HISTORY.zh-CN.md)；
+本项目由早期实现发展而来，完整血统与演变见 [docs/HISTORY.md](docs/HISTORY.md)；
 早期代码留存于 tag/branch `legacy-django`。
 
 ## 致谢

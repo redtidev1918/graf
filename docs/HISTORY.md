@@ -1,79 +1,72 @@
-# Graf — project history & lineage
+# Graf —— 项目历史与血统
 
-> This is the single document where the project's former names and earlier implementations are
-> recorded for traceability and attribution. Everything else in the repository refers only to Graf.
+> 本文是本仓库唯一集中记录前身名称与早期实现的地方，用于追溯与署名；仓库其余文档只指向 Graf。
 
-> TL;DR: vorniches/tapnote (Django, MIT) → **TeleNote** (a feature fork, Django, MIT) → **Graf**
-> (this repository: TeleNote rewritten in TypeScript for Cloudflare Workers/D1).
+> 一句话：**vorniches/tapnote**（Django，MIT）→ **TeleNote**（功能 fork，Django，MIT）→
+> **Graf**（本仓库：为 Cloudflare Workers/D1 用 TypeScript 重写的通用新项目）。
 
-## 1. The original project: vorniches/tapnote
+## 1. 最初原型：vorniches/tapnote
 
-[vorniches/tapnote](https://github.com/vorniches/tapnote) by Sérgio Vorniches (2025) is a
-minimalist self-hosted publishing platform inspired by Telegra.ph, written in Django (Python).
-It provides a no-account Markdown editor, short URLs and a small Telegraph-style API. It is
-MIT-licensed (© 2025 Sergei Vorniches) and its full history is preserved in this repository
-under the `legacy-django` tag.
+[vorniches/tapnote](https://github.com/vorniches/tapnote)（作者 Sérgio Vorniches，2025）是一个
+受 Telegra.ph 启发的极简自托管发布平台，用 Django（Python）编写：免登录 Markdown 编辑器、
+短链、一套精简的 Telegraph 风格 API。MIT 许可（© 2025 Sergei Vorniches）。本仓库以
+`legacy-django` tag 完整保留了它的全部提交历史。
 
-## 2. TeleNote — the fork
+## 2. TeleNote —— fork 及其增量
 
-TeleNote was created by the same author (redtidev1918) as a fork of tapnote. The fork kept
-the upstream Django foundation and added:
+TeleNote 是作者 redtidev1918 对 tapnote 的 fork。fork 保留了上游的
+Django 基础，并新增：
 
-- a Telegra.ph-compatible API layer (createAccount/createPage/editPage/getPage/getPageList/getViews/…) with Node<->Markdown conversion (`tapnote/telegraph.py`);
-- a Markdown-first editor page with Open Graph / social preview cards and short 8-char URLs;
-- an optional per-paragraph **comment system** (ParaNote protocol: server endpoints in
-  `tapnote/views.py`, client `static/js/paranote.js` from the author's ParaNote project), including
-  likes, per-comment deletion and user bans;
-- admin tools (Django admin, JSON export/import, PythonAnywhere auto-renewal scripts, CI).
+- Telegraph API 兼容层（createAccount/createPage/editPage/getPage/getPageList/getViews 等）
+  及 Node <-> Markdown 转换（tapnote/telegraph.py）；
+- Markdown 优先的编辑器页面：8 位短链、Open Graph/社交预览卡片；
+- 可选的**段落级评论系统**（ParaNote 协议：服务端端点 + 引入自作者 ParaNote 项目的
+  static/js/paranote.js 前端），含点赞、按作者删除、用户封禁；
+- 管理工具（Django admin、JSON 导入导出、PythonAnywhere 自动续期脚本、CI）。
 
-TeleNote was publicly announced as a fork of vorniches/tapnote, which is credited in its README.
-The two projects diverged completely on code level; only the licence history links them.
+TeleNote 对外公开时即声明为 vorniches/tapnote 的 fork 并致谢原项目；两者在代码层面已完全
+分化，仅以许可历史相连。
 
-## 3. Graf — why a Cloudflare Workers rewrite?
+## 3. Graf —— 为什么重写为 Cloudflare Workers？
 
-Graf replaces the Django backend with a TypeScript Worker so that the service runs on
-Cloudflare's edge with zero servers to operate:
+Graf 用 TypeScript Worker 取代 Django 后端，让服务跑在 Cloudflare 边缘、零服务器运维：
 
-- storage moves to **D1** (SQLite-compatible) with an equivalent schema (accounts/pages/comments/likes/bans);
-- the Django admin is replaced by a compact, login-gated `/admin` UI;
-- PythonAnywhere/Selenium renewal automation and Docker/Python tooling are gone;
-- the same *behavioral contract* is kept so clients keep working: HTTP routes, request/response
-  shapes, error codes, the ParaNote comment endpoints, cookie-based edit tokens and the
-  Node<->Markdown conventions are ported 1:1 from TeleNote (25 unit tests lock the behaviour).
+- 存储迁移到 **D1**（SQLite 兼容），表结构与旧版一一对应（accounts/pages/comments/likes/bans）；
+- Django admin 换成轻量、登录保护的 **/admin**；
+- PythonAnywhere/Selenium 自动续期、Docker/Python 工具链全部移除；
+- **行为契约保持 1:1**，客户端无需改动：HTTP 路由、请求/响应结构、错误码、ParaNote 评论
+  端点、基于 cookie 的编辑令牌、Node <-> Markdown 约定均从 TeleNote 移植（25 个单元测试锁定行为）。
 
-### What changed on purpose (deltas)
+### 刻意为之的差异
 
-- **Security hardening**: raw HTML in Markdown is no longer passed through (previously the Python
-  Markdown renderer emitted it), edit cookies are HttpOnly/SameSite=Lax (+Secure on https),
-  anonymous identities are HMAC-derived instead of reversible `md5(ip+site)` hashes, session
-  cookies are HMAC-signed, CSP and other security headers are on by default.
-- **Bug fixes inherited**: `getPage` now reports the real `views` counter; link/URL handling was
-  rewritten with proper URL parsing; import validates every row instead of crashing.
-- **Behaviour kept**: 8-char paths, edit-token cookies, view counting on HTML GETs, `createPage`
-  returning `can_edit:true`, content accepted as JSON string or array, `return_content` support,
-  comment API payloads that `paranote.js` expects, per-minute comment/like rate limits.
+- **安全加固**：Markdown 中的原始 HTML 不再透传（旧 Python 渲染器会原样输出）；
+  编辑 cookie 加 HttpOnly/SameSite=Lax（HTTPS 下再加 Secure）；匿名身份由 HMAC 派生
+  （旧版 `md5(ip+site)` 可被反推 IP）；会话 cookie 带 HMAC 签名；默认开启 CSP 等安全头。
+- **顺带修复**：getPage 现在返回真实 views 计数；链接处理改为正确的 URL 解析；
+  导入逐条校验而不再整体崩溃。
+- **保留的行为**：8 位短链、edit_token cookie、HTML 访问计数、createPage 返回 can_edit、
+  content 支持 JSON 数组或字符串、return_content、paranote.js 需要的评论 API 结构、
+  每分钟评论/点赞限流。
 
-## 4. Data & migration
+## 4. 数据与迁移
 
-Backups are JSON. The old Django export (list of pages: hashcode/content/title/author/… ) can be
-converted with `scripts/convert-django-backup.mjs` and imported through the new /admin — see
-[DEPLOYMENT.md](DEPLOYMENT.md) section 8.
+备份为 JSON。旧 Django 导出（pages 数组：hashcode/content/title/author/...）可用
+scripts/convert-django-backup.mjs 转换后经新 /admin 导入 —— 见
+docs/DEPLOYMENT.md 第 9 节。
 
-## 5. Naming
+## 5. 命名
 
-The project was named *Graf*: telegraph minus “tele”, also “paragraph” in several languages —
-a nod to both the Telegraph-compatible API and the paragraph-comment heritage of tapnote/paranote.
-It is intentionally a neutral codename; the brand strings are centralised in `src/config.ts`
-(SITE_NAME) and `wrangler.toml` (name), so renaming is a two-line change.
+项目定名 **Graf**：telegraph 去掉 tele（另在多种语言中意为“段落”）——既呼应 Telegraph
+兼容 API，也致敬 tapnote/paranote 的段落评论血统。作为中立的代号，品牌字符串集中在
+src/config.ts（SITE_NAME）与 wrangler.toml（name），改名只动两处。
 
-## 6. Legal
+## 6. 法律
 
-- Graf's code is a new TypeScript implementation (no Python or Django code is redistributed).
-- The vendored `assets/js/paranote.js` client originates from the author's own ParaNote
-  project ([redtidev1918/paranote](https://github.com/redtidev1918/paranote), MIT);
-  see THIRD_PARTY_NOTICES.md.
-- The repository keeps the full history of tapnote and TeleNote (tag `legacy-django`, branch
-  `legacy-django`) so the original MIT-licensed work and its authors remain accessible.
-- Licence: MIT. Copyright lines cover Sergei Vorniches (original tapnote) and redtidev1918
-  (TeleNote fork and Graf rewrite). See LICENSE and THIRD_PARTY_NOTICES.md.
-
+- Graf 的代码是全新的 TypeScript 实现（未再分发 Python/Django 代码）。
+- 仓库内 assets/js/paranote.js 来自作者本人的 ParaNote 项目
+  （[redtidev1918/paranote](https://github.com/redtidev1918/paranote)，MIT），
+  详见 THIRD_PARTY_NOTICES.zh-CN.md。
+- 本仓库保留 tapnote 与 TeleNote 的完整历史（tag/branch `legacy-django`），
+  使原 MIT 作品及其作者可追溯。
+- 许可：MIT。版权行同时保留 Sergei Vorniches（原始 tapnote）与 redtidev1918
+  （TeleNote fork 与 Graf 重写）。
