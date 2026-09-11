@@ -7,7 +7,7 @@ Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API
 
 > Live demo: [graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
 
-Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
+Project history and lineage: [docs/en/HISTORY.md](docs/en/HISTORY.md).
 
 ## Features
 
@@ -32,7 +32,7 @@ curl -fsSL https://raw.githubusercontent.com/redtidev1918/graf/master/scripts/in
 Already cloned? Just run `node scripts/deploy.mjs` (or `npm run deploy:auto`).
 To skip the questions, pre-set the variables (or add `--yes` for fully automatic mode — the admin
 password is auto-generated and printed once; `--dry-run` rehearses without touching Cloudflare).
-Windows is supported too — the tool is pure Node; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Windows is supported too — the tool is pure Node; see [docs/en/DEPLOYMENT.md](docs/en/DEPLOYMENT.md).
 
 ```bash
 ADMIN_USERNAME=admin ADMIN_PASSWORD='your-password' node scripts/deploy.mjs
@@ -116,8 +116,8 @@ curl -X POST https://your-worker.example/createPage \
   --data-urlencode content=[{"tag":"p","children":["Hello world"]}]
 ```
 
-Full reference: [docs/API.md](docs/API.md). Deployment: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Full reference: [docs/en/API.md](docs/en/API.md). Deployment: [docs/en/DEPLOYMENT.md](docs/en/DEPLOYMENT.md).
+Architecture notes: [docs/en/ARCHITECTURE.md](docs/en/ARCHITECTURE.md).
 
 ## Novel mode (optional)
 
@@ -184,5 +184,5 @@ Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（�
 
 Licensed under the MIT License; see [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Project history and lineage: [docs/HISTORY.md](docs/HISTORY.md).
+Project history and lineage: [docs/en/HISTORY.md](docs/en/HISTORY.md).
 Change history: [CHANGELOG.md](CHANGELOG.md).
