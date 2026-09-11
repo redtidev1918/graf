@@ -1,18 +1,9 @@
 - 开始使用
-  - [文档中心](/)
+  - [概览](/)
   - [📥 下载](/download.md)
 - 使用与开发
   - [API 参考](/API.md)
   - [架构说明](/ARCHITECTURE.md)
-- 部署运行
   - [部署指南](/DEPLOYMENT.md)
-- 关于项目
   - [项目历史与血统](/HISTORY.md)
-  - [更新日志](https://github.com/redtidev1918/graf/blob/master/CHANGELOG.zh-CN.md)
-- English
-  - [Documentation](/en/)
-  - [📥 Download](/en/download.md)
-  - [API Reference](/en/API.md)
-  - [Architecture](/en/ARCHITECTURE.md)
-  - [Deployment Guide](/en/DEPLOYMENT.md)
-  - [Project History](/en/HISTORY.md)
+- [更新日志（GitHub）](https://github.com/redtidev1918/graf/blob/master/CHANGELOG.zh-CN.md)
