@@ -1,6 +1,6 @@
 - Getting Started
   - [Overview](/en/)
-  - [📥 Download](/en/download.md)
+  - [Download](/en/download.md)
 - Usage & Development
   - [API Reference](/en/API.md)
   - [Architecture](/en/ARCHITECTURE.md)

@@ -11,7 +11,7 @@
 
 | Document | Content |
 | :-- | :-- |
-| [📥 Download](download.md) | `grafctl` releases for all platforms, auto-updated on every release |
+| [Download](download.md) | `grafctl` releases for all platforms, auto-updated on every release |
 | [API Reference](API.md) | Telegraph-compatible HTTP API |
 | [Architecture](ARCHITECTURE.md) | Code structure and runtime model |
 | [Deployment Guide](DEPLOYMENT.md) | Cloudflare Workers and self-hosting |

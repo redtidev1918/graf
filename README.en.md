@@ -5,7 +5,7 @@ Graf is a minimalist, **self-hosted Markdown publishing platform** that is **API
 [Telegra.ph](https://telegra.ph) (the Telegraph API), designed to run entirely on
 **Cloudflare Workers + D1**. One short URL, instant pages, optional paragraph-level comments.
 
-> Live demo: [graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
+Live demo: [graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
 
 Project history and lineage: [docs/en/HISTORY.md](docs/en/HISTORY.md).
 
@@ -166,7 +166,7 @@ Graf builds on external projects and specifications; thanks to:
 - **Django / Python-Markdown** — ecosystem behind the legacy implementation.
 - **Cloudflare (Workers / D1 / wrangler)** — runtime platform.
 
-Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（中文版：[THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)）.
+Third-party legal notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) (Chinese: [THIRD_PARTY_NOTICES.zh-CN.md](THIRD_PARTY_NOTICES.zh-CN.md)).
 
 ## References
 

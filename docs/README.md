@@ -3,13 +3,12 @@
 Graf 是一个极简、**自托管的 Markdown 发布平台**，**兼容 Telegra.ph（Telegraph API）**，
 整个服务跑在 **Cloudflare Workers + D1** 上：发布即得一个短链页面，可选段落级评论。
 
-> 在线示例：[graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
->
-> GitHub 仓库：[redtidev1918/graf](https://github.com/redtidev1918/graf)
+在线示例：[graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
+GitHub 仓库：[redtidev1918/graf](https://github.com/redtidev1918/graf)
 
-## 📥 下载
+## 下载
 
-`grafctl` 发布 / 管理 CLI 见 [📥 下载页](download.md)（自动指向最新 Release）；英文版见 [Download](/en/download.md)。
+`grafctl` 发布 / 管理 CLI 见 [下载页](download.md)（自动指向最新 Release）；英文版见 [Download](/en/download.md)。
 
 ## 按任务找文档
 
@@ -36,11 +35,10 @@ Graf 是一个极简、**自托管的 Markdown 发布平台**，**兼容 Telegra
 - [Architecture](en/ARCHITECTURE.md)
 - [Deployment Guide](en/DEPLOYMENT.md)
 - [Project History](en/HISTORY.md)
-- [📥 Download](/en/download.md)
+- [Download](/en/download.md)
 
 ## 其他入口
 
 - [GitHub 仓库](https://github.com/redtidev1918/graf)
 - [项目说明（README）](https://github.com/redtidev1918/graf/blob/master/README.md)
-- [部署指南](DEPLOYMENT.md)
 - [变更记录](https://github.com/redtidev1918/graf/blob/master/CHANGELOG.zh-CN.md)

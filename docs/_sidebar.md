@@ -1,6 +1,6 @@
 - 开始使用
   - [概览](/)
-  - [📥 下载](/download.md)
+  - [下载](/download.md)
 - 使用与开发
   - [API 参考](/API.md)
   - [架构说明](/ARCHITECTURE.md)

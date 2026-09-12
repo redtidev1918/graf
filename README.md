@@ -4,9 +4,8 @@
 极简、**自托管的 Markdown 发布平台**，**兼容 Telegra.ph（Telegraph API）**，整个服务跑在
 **Cloudflare Workers + D1** 上：发布即得一个短链页面，可选段落级评论。
 
-> English: [README.en.md](README.en.md)
->
-> 在线示例：[graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
+English: [README.en.md](README.en.md)
+在线示例：[graf.redtidev1918.workers.dev](https://graf.redtidev1918.workers.dev)
 
 ## 特性
 
